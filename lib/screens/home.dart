@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../color.dart';
+import '../constant/color_font.dart';
+import '../constant/sidebar.dart';
 import 'detail.dart';
 import 'login.dart';
 
@@ -28,6 +29,8 @@ class _HomepageWebState extends State<HomepageWeb> {
     'กำลังดำเนินการ',
     'เสร็จสิ้น'
   ];
+  bool isLoading = true;
+  List<dynamic> reports = [];
 
   Future<List<dynamic>> allReport() async {
     var url = "http://www.comdept.cmru.ac.th/64143168/hotel_app_php/report.php";
@@ -66,94 +69,12 @@ class _HomepageWebState extends State<HomepageWeb> {
             Expanded(
               flex: 2,
               child: Card(
-                child: Column(
-                  children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        color: bottoncolor, // สีพื้นหลัง
-                      ),
-                      child: SizedBox(
-                        width: double.infinity,
-                        child: Padding(
-                          padding: const EdgeInsets.only(top: 40, bottom: 20),
-                          child: Column(
-                            children: [
-                              Container(
-                                width: 80, // ขนาดของรูปโปรไฟล์
-                                height: 80,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle, // รูปแบบวงกลม
-                                  image: const DecorationImage(
-                                    image: AssetImage('assets/img/runnerx.png'),
-                                    fit: BoxFit.cover, // ปรับรูปให้เต็มพื้นที่
-                                  ),
-                                  border: Border.all(
-                                    color: Colors.white, // ขอบสีขาว
-                                    width: 2, // ความหนาของขอบ
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 10),
-                              Text(
-                                username ?? '', // แสดงเฉพาะชื่อ
-                                maxLines: 1,
-                                style: const TextStyle(
-                                  fontFamily: Font_.Fonts_T,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                              ),
-                              const SizedBox(height: 5),
-                              Text(
-                                'ตำแหน่ง : ${role ?? ''}', // แสดงตำแหน่ง
-                                maxLines: 1,
-                                style: const TextStyle(
-                                  fontFamily: Font_.Fonts_T,
-                                  fontSize: 14,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                    ListTile(
-                      leading: const Icon(Icons.home),
-                      title: const Text("หน้าหลัก"),
-                      onTap: () {},
-                    ),
-                    Divider(),
-                    ListTile(
-                      leading: const Icon(Icons.list),
-                      title: const Text("รายการแจ้งซ่อม"),
-                      onTap: () {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const HomepageWeb(),
-                          ),
-                        );
-                      },
-                    ),
-                    Divider(),
-                    ListTile(
-                      leading: const Icon(Icons.person),
-                      title: const Text("จัดการผู้ใช้งาน"),
-                      onTap: () {},
-                    ),
-                    Divider(),
-                    ListTile(
-                      leading: const Icon(Icons.logout),
-                      title: const Text("ออกจากระบบ"),
-                      onTap: () {
-                        logout();
-                      },
-                    ),
-                  ],
-                ),
-              ),
+                  child: Sidebar(
+                username: username,
+                role: role,
+                bottonColor: bottoncolor,
+                onLogout: logout,
+              )),
             ),
             // Main Content
             Expanded(
