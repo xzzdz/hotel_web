@@ -58,7 +58,9 @@ class _AddReportState extends State<AddReport> {
         var responseData = json.decode(response.body);
         if (responseData['success']) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("บันทึกข้อมูลสำเร็จ!")),
+            const SnackBar(
+                content: Text("บันทึกข้อมูลสำเร็จ!"),
+                backgroundColor: Colors.green),
           );
           Navigator.pushReplacement(
             context,

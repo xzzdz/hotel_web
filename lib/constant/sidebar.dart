@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:hotel_web/constant/color_font.dart';
+import 'package:hotel_web/screens/dashbord.dart';
 
 import '../screens/add_report.dart';
-import '../screens/add_users.dart';
+import '../screens/manageusers.dart';
 import '../screens/home.dart';
 
 class Sidebar extends StatelessWidget {
@@ -57,9 +59,8 @@ class Sidebar extends StatelessWidget {
                       username ?? '', // แสดงเฉพาะชื่อ
                       maxLines: 1,
                       style: const TextStyle(
-                        fontFamily: 'Font_.Fonts_T',
+                        fontFamily: FontWeight_.Fonts_T,
                         fontSize: 20,
-                        fontWeight: FontWeight.bold,
                         color: Colors.white,
                       ),
                     ),
@@ -68,7 +69,7 @@ class Sidebar extends StatelessWidget {
                       'ตำแหน่ง : ${role ?? ''}', // แสดงตำแหน่ง
                       maxLines: 1,
                       style: const TextStyle(
-                        fontFamily: 'Font_.Fonts_T',
+                        fontFamily: Font_.Fonts_T,
                         fontSize: 14,
                         color: Colors.white,
                       ),
@@ -78,15 +79,27 @@ class Sidebar extends StatelessWidget {
               ),
             ),
           ),
-          ListTile(
-            leading: const Icon(Icons.home),
-            title: const Text("หน้าหลัก"),
-            onTap: () {},
-          ),
-          const Divider(),
+          // เงื่อนไขสำหรับการแสดงเมนูจัดการผู้ใช้งาน
+          if (role == "admin") ...[
+            ListTile(
+              leading: const Icon(Icons.dashboard),
+              title: const Text("รายงานสรุป",
+                  style: TextStyle(fontFamily: Font_.Fonts_T)),
+              onTap: () {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const Dashbord(),
+                  ),
+                );
+              },
+            ),
+            const Divider(),
+          ],
           ListTile(
             leading: const Icon(Icons.list),
-            title: const Text("รายการแจ้งซ่อม"),
+            title: const Text("รายการแจ้งซ่อม",
+                style: TextStyle(fontFamily: Font_.Fonts_T)),
             onTap: () {
               Navigator.pushReplacement(
                 context,
@@ -99,7 +112,8 @@ class Sidebar extends StatelessWidget {
           const Divider(),
           ListTile(
             leading: const Icon(Icons.add),
-            title: const Text("เพิ่มการแจ้งซ่อม"),
+            title: const Text("เพิ่มการแจ้งซ่อม",
+                style: TextStyle(fontFamily: Font_.Fonts_T)),
             onTap: () {
               Navigator.pushReplacement(
                 context,
@@ -110,22 +124,27 @@ class Sidebar extends StatelessWidget {
             },
           ),
           const Divider(),
-          ListTile(
-            leading: const Icon(Icons.person),
-            title: const Text("จัดการผู้ใช้งาน"),
-            onTap: () {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const AddUsers(),
-                ),
-              );
-            },
-          ),
-          const Divider(),
+          // เงื่อนไขสำหรับการแสดงเมนูจัดการผู้ใช้งาน
+          if (role == "admin") ...[
+            ListTile(
+              leading: const Icon(Icons.person),
+              title: const Text("จัดการผู้ใช้งาน",
+                  style: TextStyle(fontFamily: Font_.Fonts_T)),
+              onTap: () {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ManageUsers(),
+                  ),
+                );
+              },
+            ),
+            const Divider(),
+          ],
           ListTile(
             leading: const Icon(Icons.logout),
-            title: const Text("ออกจากระบบ"),
+            title: const Text("ออกจากระบบ",
+                style: TextStyle(fontFamily: Font_.Fonts_T)),
             onTap: onLogout,
           ),
         ],

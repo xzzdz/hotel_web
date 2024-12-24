@@ -19,7 +19,6 @@ class _HomepageWebState extends State<HomepageWeb> {
   String? username;
   String? role;
   int currentPage = 0;
-  // final int itemsPerPage = 5;
   String? selectedType = 'ทั้งหมด';
   String? selectedStatus = 'ทั้งหมด';
   List<String> types = ['ทั้งหมด', 'ไฟฟ้า', 'ประปา', 'สวน', 'แอร์', 'อื่นๆ'];
@@ -32,6 +31,7 @@ class _HomepageWebState extends State<HomepageWeb> {
   bool isLoading = true;
   List<dynamic> reports = [];
 
+  // ฟังก์ชันในการดึงข้อมูลทั้งหมดจาก API
   Future<List<dynamic>> allReport() async {
     var url = "http://www.comdept.cmru.ac.th/64143168/hotel_app_php/report.php";
     final response = await http.post(Uri.parse(url));
@@ -43,6 +43,51 @@ class _HomepageWebState extends State<HomepageWeb> {
     }
   }
 
+  // ฟังก์ชันสำหรับลบข้อมูล
+  Future<bool> deleteReport(String id) async {
+    // แปลง id จาก String เป็น int
+    int reportId = int.parse(id);
+
+    final response = await http.post(
+      Uri.parse(
+          'http://www.comdept.cmru.ac.th/64143168/hotel_app_php/delete_report.php'),
+      body: {'id': reportId.toString()},
+    );
+
+    if (response.statusCode == 200) {
+      var data = jsonDecode(response.body);
+      if (data['status'] == 'success') {
+        // แสดงข้อความเตือนเมื่อการลบสำเร็จ
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('ลบข้อมูลสำเร็จ'),
+            backgroundColor: Colors.green,
+          ),
+        );
+        return true;
+      } else {
+        // แสดงข้อความเตือนเมื่อไม่สามารถลบได้
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('ไม่สามารถลบข้อมูลได้'),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return false;
+      }
+    } else {
+      // แสดงข้อความเตือนเมื่อมีข้อผิดพลาดจากการเชื่อมต่อ
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('เกิดข้อผิดพลาดในการเชื่อมต่อ'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return false;
+    }
+  }
+
+  // ฟังก์ชันในการดึงชื่อผู้ใช้จาก SharedPreferences
   Future<void> _loadUserName() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
@@ -109,6 +154,17 @@ class _HomepageWebState extends State<HomepageWeb> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            Text(
+                              "รายการแจ้งซ่อม",
+                              style: TextStyle(
+                                fontSize: 26,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black87,
+                              ),
+                            ),
+                            const SizedBox(height: 8.0),
+                            const Divider(thickness: 1.5),
+                            const SizedBox(height: 16.0),
                             // Dashboard Section
                             Card(
                               elevation: 4,
@@ -119,29 +175,51 @@ class _HomepageWebState extends State<HomepageWeb> {
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceEvenly,
                                   children: [
-                                    _buildDashboardItem(
-                                        "รอดำเนินการ",
-                                        filteredData
-                                            .where((item) =>
-                                                item['status'] == 'รอดำเนินการ')
-                                            .length),
-                                    _buildDashboardItem(
-                                        "กำลังดำเนินการ",
-                                        filteredData
-                                            .where((item) =>
-                                                item['status'] ==
-                                                'กำลังดำเนินการ')
-                                            .length),
-                                    _buildDashboardItem(
-                                        "เสร็จสิ้น",
-                                        filteredData
-                                            .where((item) =>
-                                                item['status'] == 'เสร็จสิ้น')
-                                            .length),
+                                    _buildDashboardItemWithStyle(
+                                      title: "รอดำเนินการ",
+                                      count: filteredData
+                                          .where((item) =>
+                                              item['status'] == 'รอดำเนินการ')
+                                          .length,
+                                      color: Colors.orange,
+                                      icon: Icons.hourglass_empty,
+                                    ),
+                                    _buildDashboardItemWithStyle(
+                                      title: "กำลังดำเนินการ",
+                                      count: filteredData
+                                          .where((item) =>
+                                              item['status'] ==
+                                              'กำลังดำเนินการ')
+                                          .length,
+                                      color: Colors.blue,
+                                      icon: Icons.autorenew,
+                                    ),
+                                    _buildDashboardItemWithStyle(
+                                      title: "เสร็จสิ้น",
+                                      count: filteredData
+                                          .where((item) =>
+                                              item['status'] == 'เสร็จสิ้น')
+                                          .length,
+                                      color: Colors.green,
+                                      icon: Icons.check_circle,
+                                    ),
+                                    _buildDashboardItemWithStyle(
+                                      title: "ทั้งหมด",
+                                      count: filteredData
+                                          .where((item) =>
+                                              item['status'] == 'รอดำเนินการ' ||
+                                              item['status'] ==
+                                                  'กำลังดำเนินการ' ||
+                                              item['status'] == 'เสร็จสิ้น')
+                                          .length,
+                                      color: Colors.purple,
+                                      icon: Icons.list_alt,
+                                    ),
                                   ],
                                 ),
                               ),
                             ),
+
                             const SizedBox(height: 16),
                             // Filters Section
                             Row(
@@ -172,8 +250,7 @@ class _HomepageWebState extends State<HomepageWeb> {
                               child: Column(
                                 children: [
                                   Expanded(
-                                    child: Scrollbar(
-                                      thumbVisibility: true,
+                                    child: SingleChildScrollView(
                                       child: SingleChildScrollView(
                                         scrollDirection: Axis.horizontal,
                                         child: SingleChildScrollView(
@@ -226,6 +303,14 @@ class _HomepageWebState extends State<HomepageWeb> {
                                                             FontWeight.bold),
                                                   ),
                                                 ),
+                                                DataColumn(
+                                                  label: Text(
+                                                    "จัดการ",
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold),
+                                                  ),
+                                                ),
                                               ],
                                               rows: filteredData
                                                   .skip(
@@ -238,15 +323,12 @@ class _HomepageWebState extends State<HomepageWeb> {
                                                 switch (item['status']) {
                                                   case 'รอดำเนินการ':
                                                     statusColor = Colors.orange;
-
                                                     break;
                                                   case 'กำลังดำเนินการ':
                                                     statusColor = Colors.blue;
-
                                                     break;
                                                   case 'เสร็จสิ้น':
                                                     statusColor = Colors.green;
-
                                                     break;
                                                   default:
                                                     statusColor = Colors.grey;
@@ -261,9 +343,10 @@ class _HomepageWebState extends State<HomepageWeb> {
                                                       Text(
                                                         item['status'],
                                                         style: TextStyle(
-                                                            color: statusColor,
-                                                            fontWeight: FontWeight
-                                                                .bold), // สีของข้อความสถานะ
+                                                          color: statusColor,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                        ), // สีของข้อความสถานะ
                                                       ),
                                                     ],
                                                   )),
@@ -295,11 +378,75 @@ class _HomepageWebState extends State<HomepageWeb> {
                                                         Navigator.push(
                                                           context,
                                                           MaterialPageRoute(
-                                                            builder: (context) =>
-                                                                Detail(
-                                                                    item: item),
+                                                            builder:
+                                                                (context) =>
+                                                                    Detail(
+                                                              item: item,
+                                                            ),
                                                           ),
                                                         );
+                                                      },
+                                                    ),
+                                                  ),
+                                                  // การลบข้อมูล/////////////////
+                                                  DataCell(
+                                                    IconButton(
+                                                      color: Colors.red,
+                                                      icon: const Icon(
+                                                          Icons.delete),
+                                                      onPressed: () async {
+                                                        // แสดงกล่องยืนยันการลบ
+                                                        bool isConfirmed =
+                                                            await showDialog(
+                                                          context: context,
+                                                          builder: (BuildContext
+                                                              context) {
+                                                            return AlertDialog(
+                                                              title: Text(
+                                                                  'ยืนยันการลบ'),
+                                                              content: Text(
+                                                                  'คุณแน่ใจว่าต้องการลบรายการนี้?'),
+                                                              actions: <Widget>[
+                                                                TextButton(
+                                                                  onPressed:
+                                                                      () {
+                                                                    Navigator.of(
+                                                                            context)
+                                                                        .pop(
+                                                                            false); // ผู้ใช้กด "ยกเลิก"
+                                                                  },
+                                                                  child: Text(
+                                                                      'ยกเลิก'),
+                                                                ),
+                                                                TextButton(
+                                                                  onPressed:
+                                                                      () {
+                                                                    Navigator.of(
+                                                                            context)
+                                                                        .pop(
+                                                                            true); // ผู้ใช้กด "ยืนยัน"
+                                                                  },
+                                                                  child: Text(
+                                                                      'ยืนยัน'),
+                                                                ),
+                                                              ],
+                                                            );
+                                                          },
+                                                        );
+
+                                                        // ถ้าผู้ใช้ยืนยันการลบ
+                                                        if (isConfirmed) {
+                                                          bool isSuccess =
+                                                              await deleteReport(
+                                                                  item['id']);
+                                                          if (isSuccess) {
+                                                            // รีเฟรชข้อมูลหลังจากลบ
+                                                            setState(() {
+                                                              filteredData
+                                                                  .remove(item);
+                                                            });
+                                                          }
+                                                        }
                                                       },
                                                     ),
                                                   ),
@@ -311,6 +458,7 @@ class _HomepageWebState extends State<HomepageWeb> {
                                       ),
                                     ),
                                   ),
+
                                   // Pagination Controls
                                   Padding(
                                     padding: const EdgeInsets.symmetric(
@@ -434,7 +582,7 @@ class _HomepageWebState extends State<HomepageWeb> {
                                         ),
                                       ],
                                     ),
-                                  ),
+                                  )
                                 ],
                               ),
                             ),
@@ -449,6 +597,35 @@ class _HomepageWebState extends State<HomepageWeb> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildDashboardItemWithStyle({
+    required String title,
+    required int count,
+    required Color color,
+    required IconData icon,
+  }) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        CircleAvatar(
+          backgroundColor: color.withOpacity(0.2),
+          child: Icon(icon, color: color),
+          radius: 24,
+        ),
+        const SizedBox(height: 8),
+        Text(
+          title,
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          "$count",
+          style: TextStyle(
+              fontSize: 20, color: color, fontWeight: FontWeight.bold),
+        ),
+      ],
     );
   }
 

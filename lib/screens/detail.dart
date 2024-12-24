@@ -4,9 +4,11 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../constant/color_font.dart';
+import '../constant/sidebar.dart';
+import 'login.dart';
 
 class Detail extends StatefulWidget {
-  final dynamic item; // ข้อมูลที่ส่งเข้ามา อาจเป็น Map หรือ Object
+  final dynamic item;
 
   const Detail({Key? key, required this.item}) : super(key: key);
 
@@ -15,22 +17,24 @@ class Detail extends StatefulWidget {
 }
 
 class _DetailState extends State<Detail> {
-  String? currentUserName; // ชื่อผู้ใช้งานที่ login
-  String? currentStatus; // สถานะปัจจุบัน
-  String? assignedTo; // ชื่อผู้รับงาน
+  String? currentUserName;
+  String? currentStatus;
+  String? assignedTo;
+  String? username;
+  String? role;
 
   @override
   void initState() {
     super.initState();
     _loadCurrentUserName();
-    fetchReportDetail(); // ดึงข้อมูลล่าสุดเมื่อเข้าใช้งาน
+    fetchReportDetail();
+    _loadUserName();
   }
 
   Future<void> _loadCurrentUserName() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      currentUserName =
-          prefs.getString('name'); // ดึงชื่อจาก shared_preferences
+      currentUserName = prefs.getString('name');
     });
   }
 
@@ -40,150 +44,155 @@ class _DetailState extends State<Detail> {
           "http://www.comdept.cmru.ac.th/64143168/hotel_app_php/get_report_detail.php";
       final response = await http.post(
         Uri.parse(url),
-        body: {'id': widget.item['id'].toString()}, // ส่ง ID เพื่อดึงข้อมูล
+        body: {'id': widget.item['id'].toString()},
       );
 
       var data = json.decode(response.body);
 
       if (data['status'] == "success") {
         setState(() {
-          currentStatus = data['report']['status']; // อัปเดตสถานะ
-          assignedTo = data['report']['assigned_to']; // อัปเดตชื่อผู้รับงาน
+          currentStatus = data['report']['status'];
+          assignedTo = data['report']['assigned_to'];
         });
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('เกิดข้อผิดพลาด: ${data['message']}')),
-        );
+        _showSnackBar('เกิดข้อผิดพลาด: ${data['message']}');
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('เกิดข้อผิดพลาด: $e')),
-      );
+      _showSnackBar('เกิดข้อผิดพลาด: $e');
     }
   }
 
-  Future<void> _updateStatus(String newStatus) async {
-    try {
-      String url =
-          "http://www.comdept.cmru.ac.th/64143168/hotel_app_php/update_status.php";
-      final response = await http.post(
-        Uri.parse(url),
-        body: {
-          'id': widget.item['id'].toString(), // รหัสแจ้งซ่อม
-          'status': newStatus, // สถานะใหม่
-          'assigned_to': currentStatus == "รอดำเนินการ"
-              ? currentUserName
-              : assignedTo, // ใช้ assignedTo เดิมเมื่อสถานะเป็น "เสร็จสิ้น"
-        },
-      );
+  void _showSnackBar(String message) {
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
+  }
 
-      var data = json.decode(response.body);
-
-      if (data['status'] == "success") {
-        setState(() {
-          currentStatus = newStatus; // อัปเดตสถานะใน UI
-          if (newStatus == "กำลังดำเนินการ") {
-            assignedTo =
-                currentUserName; // อัปเดต assignedTo ให้เป็นผู้ใช้งานปัจจุบัน
-          }
-        });
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('สถานะถูกอัปเดตเรียบร้อย')),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('เกิดข้อผิดพลาด: ${data['message']}')),
-        );
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('เกิดข้อผิดพลาด: $e')),
-      );
-    }
+  Future<void> _loadUserName() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      username = prefs.getString('name');
+      role = prefs.getString('role');
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
-      appBar: AppBar(
-        iconTheme: const IconThemeData(color: Colors.white),
-        automaticallyImplyLeading: true,
-        centerTitle: true,
-        elevation: 0,
-        backgroundColor: bottoncolor,
-        title: const Text(
-          'รายละเอียด',
-          style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.w600,
-            fontFamily: Font_.Fonts_T,
-            color: Colors.white,
-          ),
-        ),
-      ),
-      body: SingleChildScrollView(
+      backgroundColor: Colors.grey[200],
+      body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Card(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(15.0),
-          ),
-          elevation: 4,
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildDetailRow('รหัสแจ้งซ่อม:', widget.item['id'] ?? '-'),
-                _buildDetailRow('ประเภท:', widget.item['type'] ?? '-'),
-                _buildDetailRow('รายละเอียด:', widget.item['detail'] ?? '-'),
-                _buildDetailRow('สถานะ:', currentStatus ?? '-'),
-                _buildDetailRow('วันที่แจ้ง:', widget.item['date'] ?? '-'),
-                if (assignedTo != null && assignedTo!.isNotEmpty)
-                  _buildDetailRow('ผู้รับงาน:', assignedTo ?? '-'),
-                const SizedBox(height: 20),
-                Align(
-                  alignment: Alignment.center,
-                  child: currentStatus == "รอดำเนินการ"
-                      ? _buildActionButton("รับงาน", "กำลังดำเนินการ")
-                      : currentStatus == "กำลังดำเนินการ" &&
-                              assignedTo == currentUserName
-                          ? _buildActionButton("เสร็จสิ้น", "เสร็จสิ้น")
-                          : const SizedBox(),
-                ),
-              ],
+        child: Row(
+          children: [
+            // Sidebar ฝั่งซ้าย
+            Expanded(
+              flex: 2,
+              child: Sidebar(
+                username: username,
+                role: role,
+                bottonColor: bottoncolor,
+                onLogout: logout,
+              ),
             ),
-          ),
+            // Main Content ฝั่งขวา
+            Expanded(
+              flex: 8,
+              child: Container(
+                margin: const EdgeInsets.all(16.0),
+                child: Column(
+                  children: [
+                    // Header ด้านบน
+                    Container(
+                      padding: const EdgeInsets.symmetric(vertical: 10.0),
+                      decoration: BoxDecoration(
+                        color: bottoncolor,
+                        borderRadius: BorderRadius.circular(12.0),
+                      ),
+                      child: const ListTile(
+                        leading:
+                            Icon(Icons.report, size: 40, color: Colors.white),
+                        title: Text(
+                          'รายละเอียดการแจ้งซ่อม',
+                          style: TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                        subtitle: Text(
+                          'แสดงข้อมูลการแจ้งซ่อม',
+                          style: TextStyle(color: Colors.white70),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    // การ์ดแสดงรายละเอียดแจ้งซ่อม
+                    Expanded(
+                      child: Container(
+                        padding: const EdgeInsets.all(16.0),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(15),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.shade300,
+                              blurRadius: 10,
+                              offset: const Offset(0, 5),
+                            ),
+                          ],
+                        ),
+                        child: ListView(
+                          children: [
+                            _buildDetailItem('รหัสแจ้งซ่อม', widget.item['id']),
+                            _buildDetailItem('ประเภท', widget.item['type']),
+                            _buildDetailItem(
+                                'รายละเอียด', widget.item['detail']),
+                            _buildDetailItem('สถานะ', currentStatus ?? '-'),
+                            _buildDetailItem('วันที่แจ้ง', widget.item['date']),
+                            if (assignedTo != null && assignedTo!.isNotEmpty)
+                              _buildDetailItem('ผู้รับงาน', assignedTo ?? '-'),
+                            const SizedBox(height: 20),
+                            // ปุ่ม Action
+                            if (currentStatus == "รอดำเนินการ")
+                              _buildActionButton("รับงาน", "กำลังดำเนินการ"),
+                            if (currentStatus == "กำลังดำเนินการ" &&
+                                assignedTo == currentUserName)
+                              _buildActionButton("เสร็จสิ้น", "เสร็จสิ้น"),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildDetailRow(String label, String value) {
+  Widget _buildDetailItem(String title, String? value) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Expanded(
-            flex: 2,
+            flex: 3,
             child: Text(
-              label,
+              title,
               style: const TextStyle(
-                fontFamily: Font_.Fonts_T,
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
                 color: Colors.black54,
               ),
             ),
           ),
           Expanded(
-            flex: 3,
+            flex: 5,
             child: Text(
-              value,
+              value ?? '-',
               style: const TextStyle(
-                fontFamily: Font_.Fonts_T,
-                fontSize: 16,
+                fontSize: 18,
                 color: Colors.black87,
               ),
             ),
@@ -194,21 +203,65 @@ class _DetailState extends State<Detail> {
   }
 
   Widget _buildActionButton(String label, String newStatus) {
-    return ElevatedButton.icon(
-      onPressed: () => _updateStatus(newStatus),
-      icon: const Icon(Icons.check, color: Colors.white),
-      label: Text(label,
+    return Center(
+      child: ElevatedButton(
+        onPressed: () => _updateStatus(newStatus),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: bottoncolor,
+          padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+        child: Text(
+          label,
           style: const TextStyle(
-            fontFamily: Font_.Fonts_T,
+            fontSize: 18,
             color: Colors.white,
-            fontSize: 16,
-          )),
-      style: ElevatedButton.styleFrom(
-        backgroundColor: bottoncolor,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
+          ),
         ),
       ),
+    );
+  }
+
+  Future<void> _updateStatus(String newStatus) async {
+    try {
+      String url =
+          "http://www.comdept.cmru.ac.th/64143168/hotel_app_php/update_status.php";
+      final response = await http.post(
+        Uri.parse(url),
+        body: {
+          'id': widget.item['id'].toString(),
+          'status': newStatus,
+          'assigned_to':
+              currentStatus == "รอดำเนินการ" ? currentUserName : assignedTo,
+        },
+      );
+
+      var data = json.decode(response.body);
+
+      if (data['status'] == "success") {
+        setState(() {
+          currentStatus = newStatus;
+          if (newStatus == "กำลังดำเนินการ") {
+            assignedTo = currentUserName;
+          }
+        });
+        _showSnackBar('สถานะถูกอัปเดตเรียบร้อย');
+      } else {
+        _showSnackBar('เกิดข้อผิดพลาด: ${data['message']}');
+      }
+    } catch (e) {
+      _showSnackBar('เกิดข้อผิดพลาด: $e');
+    }
+  }
+
+  Future<void> logout() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.clear();
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => const Login()),
     );
   }
 }
