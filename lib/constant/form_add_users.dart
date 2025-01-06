@@ -41,7 +41,7 @@ class _AddUserFormState extends State<AddUserForm> {
               labelText: 'ตำแหน่ง',
               border: OutlineInputBorder(),
             ),
-            items: ['admin', 'technician', 'staff'].map((role) {
+            items: ['ผู้ดูแลระบบ', 'พนักงาน', 'ช่างซ่อม'].map((role) {
               return DropdownMenuItem<String>(
                 value: role,
                 child: Text(role),
@@ -65,14 +65,14 @@ class _AddUserFormState extends State<AddUserForm> {
           TextFormField(
             controller: widget.nameController,
             decoration: const InputDecoration(
-              labelText: 'ชื่อ',
+              labelText: 'ชื่อ - นามสกุล',
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.all(Radius.circular(10.0)),
               ),
             ),
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return 'กรุณากรอกชื่อ';
+                return 'กรุณากรอกชื่อ - นามสกุล';
               }
               return null;
             },
@@ -83,14 +83,14 @@ class _AddUserFormState extends State<AddUserForm> {
           TextFormField(
             controller: widget.emailController,
             decoration: const InputDecoration(
-              labelText: 'อีเมล',
+              labelText: 'ชื่อผู้ใช้งาน',
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.all(Radius.circular(10.0)),
               ),
             ),
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return 'กรุณากรอกอีเมล';
+                return 'กรุณากรอกชื่อผู้ใช้งาน';
               }
               return null;
             },

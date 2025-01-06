@@ -22,9 +22,9 @@ class _AddUsersState extends State<ManageUsers> {
   String? selectedRole = 'ทั้งหมด';
   List<String> roles = [
     'ทั้งหมด',
-    'admin',
-    'staff',
-    'technician',
+    'ผู้ดูแลระบบ',
+    'พนักงาน',
+    'ช่างซ่อม',
   ];
 
   List<dynamic> users = [];
@@ -356,9 +356,10 @@ class _AddUsersState extends State<ManageUsers> {
                                                               emailController,
                                                           decoration:
                                                               const InputDecoration(
-                                                            labelText: 'อีเมล',
+                                                            labelText:
+                                                                'ชื่อผู้ใช้งาน',
                                                             hintText:
-                                                                'ใส่อีเมล',
+                                                                'ใส่ชื่อผู้ใช้งาน',
                                                             border:
                                                                 UnderlineInputBorder(),
                                                           ),
@@ -367,7 +368,7 @@ class _AddUsersState extends State<ManageUsers> {
                                                                 value
                                                                     .trim()
                                                                     .isEmpty) {
-                                                              return 'กรุณาใส่อีเมล';
+                                                              return 'กรุณาใส่ชื่อผู้ใช้งาน';
                                                             }
 
                                                             return null;
@@ -387,9 +388,9 @@ class _AddUsersState extends State<ManageUsers> {
                                                                   .text
                                                               : null,
                                                           items: [
-                                                            'admin',
-                                                            'technician',
-                                                            'staff'
+                                                            'ผู้ดูแลระบบ',
+                                                            'พนักงาน',
+                                                            'ช่างซ่อม'
                                                           ].map((role) {
                                                             return DropdownMenuItem(
                                                               value: role,
@@ -402,7 +403,8 @@ class _AddUsersState extends State<ManageUsers> {
                                                           },
                                                           decoration:
                                                               const InputDecoration(
-                                                            labelText: 'Role',
+                                                            labelText:
+                                                                'ตำแหน่งงาน',
                                                             border:
                                                                 UnderlineInputBorder(),
                                                           ),
@@ -411,7 +413,7 @@ class _AddUsersState extends State<ManageUsers> {
                                                                 value
                                                                     .trim()
                                                                     .isEmpty) {
-                                                              return 'กรุณาเลือก Role';
+                                                              return 'กรุณาเลือก ตำแหน่งงาน';
                                                             }
                                                             return null;
                                                           },
@@ -427,7 +429,7 @@ class _AddUsersState extends State<ManageUsers> {
                                                           decoration:
                                                               const InputDecoration(
                                                             labelText:
-                                                                'รหัสผ่านใหม่ (ไม่บังคับ)',
+                                                                'รหัสผ่านใหม่',
                                                             hintText:
                                                                 'ใส่รหัสผ่านใหม่',
                                                             border:
@@ -441,13 +443,14 @@ class _AddUsersState extends State<ManageUsers> {
                                                   actions: [
                                                     TextButton(
                                                       child:
-                                                          const Text('Cancel'),
+                                                          const Text('ยกเลิก'),
                                                       onPressed: () =>
                                                           Navigator.of(context)
                                                               .pop(),
                                                     ),
                                                     TextButton(
-                                                      child: const Text('Save'),
+                                                      child:
+                                                          const Text('บันทึก'),
                                                       onPressed: () {
                                                         // ตรวจสอบว่าฟอร์มถูกต้องหรือไม่
                                                         if (formKey

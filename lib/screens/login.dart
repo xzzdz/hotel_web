@@ -55,7 +55,7 @@ class _LoginState extends State<Login> {
     } else if (data['status'] == "success") {
       // print("Name from API: ${data['name']}"); // ตรวจสอบค่าที่ได้จาก API
       String role = data['role']; // รับค่า role จาก API
-      if (role == "admin" || role == "staff") {
+      if (role == "ผู้ดูแลระบบ" || role == "พนักงาน") {
         // บันทึกชื่อผู้ใช้ลงใน shared_preferences
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setBool('isLoggedIn', true);

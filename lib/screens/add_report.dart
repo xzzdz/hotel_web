@@ -27,8 +27,8 @@ class _AddReportState extends State<AddReport> {
   List<String> types = ['ไฟฟ้า', 'ประปา', 'สวน', 'แอร์', 'อื่นๆ'];
   List<String> statuses = [
     'รอดำเนินการ',
-    // 'กำลังดำเนินการ',
-    // 'เสร็จสิ้น',
+    //   // 'กำลังดำเนินการ',
+    //   // 'เสร็จสิ้น',
   ];
 
   Future<void> _loadUserName() async {
@@ -37,6 +37,7 @@ class _AddReportState extends State<AddReport> {
       username = prefs.getString('name');
       role = prefs.getString('role');
     });
+    print("Username: $username, Role: $role");
   }
 
   Future<void> _submitReport() async {
@@ -47,6 +48,7 @@ class _AddReportState extends State<AddReport> {
       final response = await http.post(
         Uri.parse(url),
         body: {
+          'username': username, // เพิ่มชื่อผู้ใช้งานที่ล็อกอิน
           'date': _selectedDate.toIso8601String(),
           'type': _selectedType,
           'status': _selectedStatus,
@@ -70,6 +72,8 @@ class _AddReportState extends State<AddReport> {
             ),
           ); // กลับไปยังหน้าก่อนหน้า
         } else {
+          print(responseData['message']);
+
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
                 content: Text("เกิดข้อผิดพลาด: ${responseData['message']}")),
@@ -156,25 +160,25 @@ class _AddReportState extends State<AddReport> {
                               },
                             ),
                             const SizedBox(height: 16),
-                            DropdownButtonFormField<String>(
-                              value: _selectedStatus,
-                              decoration: const InputDecoration(
-                                labelText: 'สถานะ',
-                                border: OutlineInputBorder(),
-                              ),
-                              items: statuses.map((status) {
-                                return DropdownMenuItem<String>(
-                                  value: status,
-                                  child: Text(status),
-                                );
-                              }).toList(),
-                              onChanged: (value) {
-                                setState(() {
-                                  _selectedStatus = value!;
-                                });
-                              },
-                            ),
-                            const SizedBox(height: 16),
+                            // DropdownButtonFormField<String>(
+                            //   value: _selectedStatus,
+                            //   decoration: const InputDecoration(
+                            //     labelText: 'สถานะ',
+                            //     border: OutlineInputBorder(),
+                            //   ),
+                            //   items: statuses.map((status) {
+                            //     return DropdownMenuItem<String>(
+                            //       value: status,
+                            //       child: Text(status),
+                            //     );
+                            //   }).toList(),
+                            //   onChanged: (value) {
+                            //     setState(() {
+                            //       _selectedStatus = value!;
+                            //     });
+                            //   },
+                            // ),
+                            // const SizedBox(height: 16),
                             TextFormField(
                               controller: _detailController,
                               maxLines: 3,
@@ -195,17 +199,17 @@ class _AddReportState extends State<AddReport> {
                               label: Text(
                                   "วันที่: ${_selectedDate.toLocal().toString().split(' ')[0]}"),
                               onPressed: () async {
-                                DateTime? picked = await showDatePicker(
-                                  context: context,
-                                  initialDate: _selectedDate,
-                                  firstDate: DateTime(2000),
-                                  lastDate: DateTime(2100),
-                                );
-                                if (picked != null && picked != _selectedDate) {
-                                  setState(() {
-                                    _selectedDate = picked;
-                                  });
-                                }
+                                // DateTime? picked = await showDatePicker(
+                                //   context: context,
+                                //   initialDate: _selectedDate,
+                                //   firstDate: DateTime(2000),
+                                //   lastDate: DateTime(2100),
+                                // );
+                                // if (picked != null && picked != _selectedDate) {
+                                //   setState(() {
+                                //     _selectedDate = picked;
+                                //   });
+                                // }
                               },
                             ),
                             const SizedBox(height: 16),

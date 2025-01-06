@@ -80,7 +80,7 @@ class Sidebar extends StatelessWidget {
             ),
           ),
           // เงื่อนไขสำหรับการแสดงเมนูจัดการผู้ใช้งาน
-          if (role == "admin") ...[
+          if (role == "ผู้ดูแลระบบ") ...[
             ListTile(
               leading: const Icon(Icons.dashboard),
               title: const Text("รายงานสรุป",
@@ -125,7 +125,7 @@ class Sidebar extends StatelessWidget {
           ),
           const Divider(),
           // เงื่อนไขสำหรับการแสดงเมนูจัดการผู้ใช้งาน
-          if (role == "admin") ...[
+          if (role == "ผู้ดูแลระบบ") ...[
             ListTile(
               leading: const Icon(Icons.person),
               title: const Text("จัดการผู้ใช้งาน",

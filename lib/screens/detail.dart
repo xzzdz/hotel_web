@@ -53,6 +53,7 @@ class _DetailState extends State<Detail> {
         setState(() {
           currentStatus = data['report']['status'];
           assignedTo = data['report']['assigned_to'];
+          username = data['report']['username']; // ดึงข้อมูล username
         });
       } else {
         _showSnackBar('เกิดข้อผิดพลาด: ${data['message']}');
@@ -143,20 +144,23 @@ class _DetailState extends State<Detail> {
                         child: ListView(
                           children: [
                             _buildDetailItem('รหัสแจ้งซ่อม', widget.item['id']),
+                            _buildDetailItem(
+                                'ผู้แจ้ง', username ?? '-'), // ใช้ username
                             _buildDetailItem('ประเภท', widget.item['type']),
                             _buildDetailItem(
                                 'รายละเอียด', widget.item['detail']),
                             _buildDetailItem('สถานะ', currentStatus ?? '-'),
                             _buildDetailItem('วันที่แจ้ง', widget.item['date']),
+
                             if (assignedTo != null && assignedTo!.isNotEmpty)
                               _buildDetailItem('ผู้รับงาน', assignedTo ?? '-'),
                             const SizedBox(height: 20),
-                            // ปุ่ม Action
-                            if (currentStatus == "รอดำเนินการ")
-                              _buildActionButton("รับงาน", "กำลังดำเนินการ"),
-                            if (currentStatus == "กำลังดำเนินการ" &&
-                                assignedTo == currentUserName)
-                              _buildActionButton("เสร็จสิ้น", "เสร็จสิ้น"),
+                            // // ปุ่ม Action
+                            // if (currentStatus == "รอดำเนินการ")
+                            //   _buildActionButton("รับงาน", "กำลังดำเนินการ"),
+                            // if (currentStatus == "กำลังดำเนินการ" &&
+                            //     assignedTo == currentUserName)
+                            //   _buildActionButton("เสร็จสิ้น", "เสร็จสิ้น"),//////function รับงานและเสร็จสิ้น
                           ],
                         ),
                       ),
