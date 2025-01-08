@@ -17,6 +17,7 @@ class ManageUsers extends StatefulWidget {
 
 class _AddUsersState extends State<ManageUsers> {
   // Variables for storing user data
+  bool _obscureText = true;
   String? username;
   String? role;
   String? selectedRole = 'ทั้งหมด';
@@ -273,7 +274,7 @@ class _AddUsersState extends State<ManageUsers> {
                                         style: TextStyle(
                                             fontWeight: FontWeight.bold))),
                                 DataColumn(
-                                    label: Text('อีเมล',
+                                    label: Text('ชื่อผู้ใช้งาน',
                                         style: TextStyle(
                                             fontWeight: FontWeight.bold))),
                                 DataColumn(
@@ -315,155 +316,194 @@ class _AddUsersState extends State<ManageUsers> {
                                                   ""; // ตั้งค่าเริ่มต้นให้เป็นค่าว่าง
                                               showDialog(
                                                 context: context,
-                                                builder: (context) =>
-                                                    AlertDialog(
-                                                  title: const Text(
-                                                      'แก้ไขผู้ใช้งาน'),
-                                                  content: Form(
-                                                    key: formKey,
-                                                    child: Column(
-                                                      mainAxisSize:
-                                                          MainAxisSize.min,
-                                                      children: [
-                                                        // ชื่อผู้ใช้งาน
-                                                        TextFormField(
-                                                          controller:
-                                                              nameController,
-                                                          decoration:
-                                                              const InputDecoration(
-                                                            labelText: 'ชื่อ',
-                                                            hintText: 'ใส่ชื่อ',
-                                                            border:
-                                                                UnderlineInputBorder(),
+                                                builder: (context) {
+                                                  bool dialogObscureText =
+                                                      _obscureText; // ใช้ตัวแปรแยกใน dialog
+                                                  return StatefulBuilder(
+                                                    builder: (context,
+                                                        setDialogState) {
+                                                      return AlertDialog(
+                                                        title: const Text(
+                                                            'แก้ไขผู้ใช้งาน'),
+                                                        content: Form(
+                                                          key: formKey,
+                                                          child: Column(
+                                                            mainAxisSize:
+                                                                MainAxisSize
+                                                                    .min,
+                                                            children: [
+                                                              // ชื่อผู้ใช้งาน
+                                                              TextFormField(
+                                                                controller:
+                                                                    nameController,
+                                                                decoration:
+                                                                    const InputDecoration(
+                                                                  labelText:
+                                                                      'ชื่อ - นามสกุล',
+                                                                  hintText:
+                                                                      'ใส่ชื่อ - นามสกุล',
+                                                                  border:
+                                                                      UnderlineInputBorder(),
+                                                                ),
+                                                                validator:
+                                                                    (value) {
+                                                                  if (value ==
+                                                                          null ||
+                                                                      value
+                                                                          .trim()
+                                                                          .isEmpty) {
+                                                                    return 'กรุณาใส่ชื่อ - นามสกุล';
+                                                                  }
+                                                                  return null;
+                                                                },
+                                                              ),
+
+                                                              const SizedBox(
+                                                                  height: 8.0),
+
+                                                              // อีเมลผู้ใช้งาน
+                                                              TextFormField(
+                                                                controller:
+                                                                    emailController,
+                                                                decoration:
+                                                                    const InputDecoration(
+                                                                  labelText:
+                                                                      'ชื่อผู้ใช้งาน',
+                                                                  hintText:
+                                                                      'ใส่ชื่อผู้ใช้งาน',
+                                                                  border:
+                                                                      UnderlineInputBorder(),
+                                                                ),
+                                                                validator:
+                                                                    (value) {
+                                                                  if (value ==
+                                                                          null ||
+                                                                      value
+                                                                          .trim()
+                                                                          .isEmpty) {
+                                                                    return 'กรุณาใส่ชื่อผู้ใช้งาน';
+                                                                  }
+                                                                  return null;
+                                                                },
+                                                              ),
+
+                                                              const SizedBox(
+                                                                  height: 8.0),
+
+                                                              // ตำแหน่งงานผู้ใช้งาน
+                                                              DropdownButtonFormField<
+                                                                  String>(
+                                                                value: roleController
+                                                                        .text
+                                                                        .isNotEmpty
+                                                                    ? roleController
+                                                                        .text
+                                                                    : null,
+                                                                items: [
+                                                                  'ผู้ดูแลระบบ',
+                                                                  'พนักงาน',
+                                                                  'ช่างซ่อม'
+                                                                ].map((role) {
+                                                                  return DropdownMenuItem(
+                                                                    value: role,
+                                                                    child: Text(
+                                                                        role),
+                                                                  );
+                                                                }).toList(),
+                                                                onChanged:
+                                                                    (value) {
+                                                                  roleController
+                                                                          .text =
+                                                                      value!;
+                                                                },
+                                                                decoration:
+                                                                    const InputDecoration(
+                                                                  labelText:
+                                                                      'ตำแหน่งงาน',
+                                                                  border:
+                                                                      UnderlineInputBorder(),
+                                                                ),
+                                                                validator:
+                                                                    (value) {
+                                                                  if (value ==
+                                                                          null ||
+                                                                      value
+                                                                          .trim()
+                                                                          .isEmpty) {
+                                                                    return 'กรุณาเลือก ตำแหน่งงาน';
+                                                                  }
+                                                                  return null;
+                                                                },
+                                                              ),
+
+                                                              const SizedBox(
+                                                                  height: 8.0),
+
+                                                              // รหัสผ่านใหม่
+                                                              TextFormField(
+                                                                controller:
+                                                                    passwordController,
+                                                                obscureText:
+                                                                    dialogObscureText,
+                                                                decoration:
+                                                                    InputDecoration(
+                                                                  labelText:
+                                                                      'รหัสผ่านใหม่',
+                                                                  hintText:
+                                                                      'ใส่รหัสผ่านใหม่',
+                                                                  suffixIcon:
+                                                                      IconButton(
+                                                                    icon: Icon(
+                                                                      dialogObscureText
+                                                                          ? Icons
+                                                                              .visibility_off
+                                                                          : Icons
+                                                                              .visibility,
+                                                                    ),
+                                                                    onPressed:
+                                                                        () {
+                                                                      setDialogState(
+                                                                          () {
+                                                                        dialogObscureText =
+                                                                            !dialogObscureText;
+                                                                      });
+                                                                    },
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ],
                                                           ),
-                                                          validator: (value) {
-                                                            if (value == null ||
-                                                                value
-                                                                    .trim()
-                                                                    .isEmpty) {
-                                                              return 'กรุณาใส่ชื่อ';
-                                                            }
-                                                            return null;
-                                                          },
                                                         ),
-
-                                                        const SizedBox(
-                                                            height: 8.0),
-
-                                                        // อีเมลผู้ใช้งาน
-                                                        TextFormField(
-                                                          controller:
-                                                              emailController,
-                                                          decoration:
-                                                              const InputDecoration(
-                                                            labelText:
-                                                                'ชื่อผู้ใช้งาน',
-                                                            hintText:
-                                                                'ใส่ชื่อผู้ใช้งาน',
-                                                            border:
-                                                                UnderlineInputBorder(),
+                                                        actions: [
+                                                          TextButton(
+                                                            child: const Text(
+                                                                'ยกเลิก'),
+                                                            onPressed: () =>
+                                                                Navigator.of(
+                                                                        context)
+                                                                    .pop(),
                                                           ),
-                                                          validator: (value) {
-                                                            if (value == null ||
-                                                                value
-                                                                    .trim()
-                                                                    .isEmpty) {
-                                                              return 'กรุณาใส่ชื่อผู้ใช้งาน';
-                                                            }
-
-                                                            return null;
-                                                          },
-                                                        ),
-
-                                                        const SizedBox(
-                                                            height: 8.0),
-
-                                                        // ตำแหน่งงานผู้ใช้งาน
-                                                        DropdownButtonFormField<
-                                                            String>(
-                                                          value: roleController
-                                                                  .text
-                                                                  .isNotEmpty
-                                                              ? roleController
-                                                                  .text
-                                                              : null,
-                                                          items: [
-                                                            'ผู้ดูแลระบบ',
-                                                            'พนักงาน',
-                                                            'ช่างซ่อม'
-                                                          ].map((role) {
-                                                            return DropdownMenuItem(
-                                                              value: role,
-                                                              child: Text(role),
-                                                            );
-                                                          }).toList(),
-                                                          onChanged: (value) {
-                                                            roleController
-                                                                .text = value!;
-                                                          },
-                                                          decoration:
-                                                              const InputDecoration(
-                                                            labelText:
-                                                                'ตำแหน่งงาน',
-                                                            border:
-                                                                UnderlineInputBorder(),
+                                                          TextButton(
+                                                            child: const Text(
+                                                                'บันทึก'),
+                                                            onPressed: () {
+                                                              // ตรวจสอบว่าฟอร์มถูกต้องหรือไม่
+                                                              if (formKey
+                                                                  .currentState!
+                                                                  .validate()) {
+                                                                editUser(
+                                                                    user['id']);
+                                                                Navigator.of(
+                                                                        context)
+                                                                    .pop();
+                                                              }
+                                                            },
                                                           ),
-                                                          validator: (value) {
-                                                            if (value == null ||
-                                                                value
-                                                                    .trim()
-                                                                    .isEmpty) {
-                                                              return 'กรุณาเลือก ตำแหน่งงาน';
-                                                            }
-                                                            return null;
-                                                          },
-                                                        ),
-
-                                                        const SizedBox(
-                                                            height: 8.0),
-
-                                                        // รหัสผ่านใหม่ (ไม่บังคับ)
-                                                        TextFormField(
-                                                          controller:
-                                                              passwordController,
-                                                          decoration:
-                                                              const InputDecoration(
-                                                            labelText:
-                                                                'รหัสผ่านใหม่',
-                                                            hintText:
-                                                                'ใส่รหัสผ่านใหม่',
-                                                            border:
-                                                                UnderlineInputBorder(),
-                                                          ),
-                                                          obscureText: true,
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                  actions: [
-                                                    TextButton(
-                                                      child:
-                                                          const Text('ยกเลิก'),
-                                                      onPressed: () =>
-                                                          Navigator.of(context)
-                                                              .pop(),
-                                                    ),
-                                                    TextButton(
-                                                      child:
-                                                          const Text('บันทึก'),
-                                                      onPressed: () {
-                                                        // ตรวจสอบว่าฟอร์มถูกต้องหรือไม่
-                                                        if (formKey
-                                                            .currentState!
-                                                            .validate()) {
-                                                          editUser(user['id']);
-                                                          Navigator.of(context)
-                                                              .pop();
-                                                        }
-                                                      },
-                                                    ),
-                                                  ],
-                                                ),
+                                                        ],
+                                                      );
+                                                    },
+                                                  );
+                                                },
                                               );
                                             },
                                           ),
@@ -517,7 +557,6 @@ class _AddUsersState extends State<ManageUsers> {
                           ],
                         ),
                       ),
-
                       // Add User Form
                       Container(
                         alignment: Alignment.bottomRight,

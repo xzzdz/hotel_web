@@ -22,6 +22,7 @@ class _DetailState extends State<Detail> {
   String? assignedTo;
   String? username;
   String? role;
+  String? location; // เพิ่มตัวแปรสำหรับสถานที่
 
   @override
   void initState() {
@@ -54,6 +55,7 @@ class _DetailState extends State<Detail> {
           currentStatus = data['report']['status'];
           assignedTo = data['report']['assigned_to'];
           username = data['report']['username']; // ดึงข้อมูล username
+          location = data['report']['location']; // ดึงข้อมูล location
         });
       } else {
         _showSnackBar('เกิดข้อผิดพลาด: ${data['message']}');
@@ -148,6 +150,8 @@ class _DetailState extends State<Detail> {
                                 'ผู้แจ้ง', username ?? '-'), // ใช้ username
                             _buildDetailItem('ประเภท', widget.item['type']),
                             _buildDetailItem(
+                                'สถานที่', location ?? '-'), // แสดงสถานที่
+                            _buildDetailItem(
                                 'รายละเอียด', widget.item['detail']),
                             _buildDetailItem('สถานะ', currentStatus ?? '-'),
                             _buildDetailItem('วันที่แจ้ง', widget.item['date']),
@@ -155,12 +159,6 @@ class _DetailState extends State<Detail> {
                             if (assignedTo != null && assignedTo!.isNotEmpty)
                               _buildDetailItem('ผู้รับงาน', assignedTo ?? '-'),
                             const SizedBox(height: 20),
-                            // // ปุ่ม Action
-                            // if (currentStatus == "รอดำเนินการ")
-                            //   _buildActionButton("รับงาน", "กำลังดำเนินการ"),
-                            // if (currentStatus == "กำลังดำเนินการ" &&
-                            //     assignedTo == currentUserName)
-                            //   _buildActionButton("เสร็จสิ้น", "เสร็จสิ้น"),//////function รับงานและเสร็จสิ้น
                           ],
                         ),
                       ),

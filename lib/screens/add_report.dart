@@ -20,16 +20,13 @@ class _AddReportState extends State<AddReport> {
   String? role;
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _detailController = TextEditingController();
+  final TextEditingController _locationController = TextEditingController();
   String _selectedType = 'ไฟฟ้า';
   String _selectedStatus = 'รอดำเนินการ';
   DateTime _selectedDate = DateTime.now();
 
   List<String> types = ['ไฟฟ้า', 'ประปา', 'สวน', 'แอร์', 'อื่นๆ'];
-  List<String> statuses = [
-    'รอดำเนินการ',
-    //   // 'กำลังดำเนินการ',
-    //   // 'เสร็จสิ้น',
-  ];
+  List<String> statuses = ['รอดำเนินการ'];
 
   Future<void> _loadUserName() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -37,7 +34,7 @@ class _AddReportState extends State<AddReport> {
       username = prefs.getString('name');
       role = prefs.getString('role');
     });
-    print("Username: $username, Role: $role");
+    // print("Username: $username, Role: $role");
   }
 
   Future<void> _submitReport() async {
@@ -53,6 +50,7 @@ class _AddReportState extends State<AddReport> {
           'type': _selectedType,
           'status': _selectedStatus,
           'detail': _detailController.text,
+          'location': _locationController.text, // ส่งข้อมูลสถานที่
         },
       );
 
@@ -180,6 +178,20 @@ class _AddReportState extends State<AddReport> {
                             // ),
                             // const SizedBox(height: 16),
                             TextFormField(
+                              controller: _locationController,
+                              decoration: const InputDecoration(
+                                labelText: 'สถานที่',
+                                border: OutlineInputBorder(),
+                              ),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'กรุณากรอกสถานที่';
+                                }
+                                return null;
+                              },
+                            ),
+                            const SizedBox(height: 16),
+                            TextFormField(
                               controller: _detailController,
                               maxLines: 3,
                               decoration: const InputDecoration(
@@ -212,6 +224,7 @@ class _AddReportState extends State<AddReport> {
                                 // }
                               },
                             ),
+
                             const SizedBox(height: 16),
                             Center(
                               child: ElevatedButton(

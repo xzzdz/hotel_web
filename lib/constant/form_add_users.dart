@@ -25,6 +25,8 @@ class AddUserForm extends StatefulWidget {
 }
 
 class _AddUserFormState extends State<AddUserForm> {
+  bool _obscureText = true;
+
   @override
   Widget build(BuildContext context) {
     return Form(
@@ -100,11 +102,21 @@ class _AddUserFormState extends State<AddUserForm> {
           // Password Field
           TextFormField(
             controller: widget.passwordController,
-            obscureText: true,
-            decoration: const InputDecoration(
+            obscureText: _obscureText,
+            decoration: InputDecoration(
               labelText: 'รหัสผ่าน',
-              border: OutlineInputBorder(
+              border: const OutlineInputBorder(
                 borderRadius: BorderRadius.all(Radius.circular(10.0)),
+              ),
+              suffixIcon: IconButton(
+                icon: Icon(
+                  _obscureText ? Icons.visibility_off : Icons.visibility,
+                ),
+                onPressed: () {
+                  setState(() {
+                    _obscureText = !_obscureText;
+                  });
+                },
               ),
             ),
             validator: (value) {
