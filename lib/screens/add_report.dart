@@ -206,25 +206,26 @@ class _AddReportState extends State<AddReport> {
                               },
                             ),
                             const SizedBox(height: 16),
-                            TextButton.icon(
-                              icon: const Icon(Icons.calendar_today),
-                              label: Text(
-                                  "วันที่: ${_selectedDate.toLocal().toString().split(' ')[0]}"),
-                              onPressed: () async {
-                                // DateTime? picked = await showDatePicker(
-                                //   context: context,
-                                //   initialDate: _selectedDate,
-                                //   firstDate: DateTime(2000),
-                                //   lastDate: DateTime(2100),
-                                // );
-                                // if (picked != null && picked != _selectedDate) {
-                                //   setState(() {
-                                //     _selectedDate = picked;
-                                //   });
-                                // }
-                              },
+                            Row(
+                              children: [
+                                const Icon(
+                                  Icons.calendar_today, // เลือกไอคอนที่ต้องการ
+                                  color: Colors.black87,
+                                  size: 20,
+                                ),
+                                const SizedBox(
+                                    width:
+                                        8), // เพิ่มช่องว่างระหว่างไอคอนกับข้อความ
+                                Text(
+                                  "วันที่: ${_selectedDate.toLocal().toString().split(' ')[0]}",
+                                  style: const TextStyle(
+                                    fontFamily: Font_.Fonts_T,
+                                    // fontSize: 16,
+                                    color: Colors.black87,
+                                  ),
+                                ),
+                              ],
                             ),
-
                             const SizedBox(height: 16),
                             Center(
                               child: ElevatedButton(
