@@ -18,6 +18,7 @@ class Dashbord extends StatefulWidget {
 class _DashbordState extends State<Dashbord> {
   String? username;
   String? role;
+  String selectedYear = DateTime.now().year.toString(); // กำหนดปีปัจจุบัน
 
   Future<List<dynamic>> fetchReports() async {
     const url =
@@ -25,10 +26,77 @@ class _DashbordState extends State<Dashbord> {
     final response = await http.post(Uri.parse(url));
 
     if (response.statusCode == 200) {
-      return json.decode(utf8.decode(response.bodyBytes));
+      // แปลงข้อมูล JSON
+      List<dynamic> reports = json.decode(utf8.decode(response.bodyBytes));
+      // กรองข้อมูลตามปีที่เลือก
+      return reports.where((report) {
+        String reportYear = report['date'].split('-')[0]; // ดึงปีจาก 'date'
+        return reportYear == selectedYear;
+      }).toList();
     } else {
       throw Exception("Failed to load reports");
     }
+  }
+
+  Map<String, int> processDataByMonth(List<dynamic> reports) {
+    Map<String, int> monthCounts = {
+      'มกราคม': 0,
+      'กุมภาพันธ์': 0,
+      'มีนาคม': 0,
+      'เมษายน': 0,
+      'พฤษภาคม': 0,
+      'มิถุนายน': 0,
+      'กรกฎาคม': 0,
+      'สิงหาคม': 0,
+      'กันยายน': 0,
+      'ตุลาคม': 0,
+      'พฤศจิกายน': 0,
+      'ธันวาคม': 0,
+    };
+
+    for (var report in reports) {
+      String month = report['date'].split('-')[1]; // ดึงเดือนจาก 'date'
+      switch (month) {
+        case '01':
+          monthCounts['มกราคม'] = (monthCounts['มกราคม'] ?? 0) + 1;
+          break;
+        case '02':
+          monthCounts['กุมภาพันธ์'] = (monthCounts['กุมภาพันธ์'] ?? 0) + 1;
+          break;
+        case '03':
+          monthCounts['มีนาคม'] = (monthCounts['มีนาคม'] ?? 0) + 1;
+          break;
+        case '04':
+          monthCounts['เมษายน'] = (monthCounts['เมษายน'] ?? 0) + 1;
+          break;
+        case '05':
+          monthCounts['พฤษภาคม'] = (monthCounts['พฤษภาคม'] ?? 0) + 1;
+          break;
+        case '06':
+          monthCounts['มิถุนายน'] = (monthCounts['มิถุนายน'] ?? 0) + 1;
+          break;
+        case '07':
+          monthCounts['กรกฎาคม'] = (monthCounts['กรกฎาคม'] ?? 0) + 1;
+          break;
+        case '08':
+          monthCounts['สิงหาคม'] = (monthCounts['สิงหาคม'] ?? 0) + 1;
+          break;
+        case '09':
+          monthCounts['กันยายน'] = (monthCounts['กันยายน'] ?? 0) + 1;
+          break;
+        case '10':
+          monthCounts['ตุลาคม'] = (monthCounts['ตุลาคม'] ?? 0) + 1;
+          break;
+        case '11':
+          monthCounts['พฤศจิกายน'] = (monthCounts['พฤศจิกายน'] ?? 0) + 1;
+          break;
+        case '12':
+          monthCounts['ธันวาคม'] = (monthCounts['ธันวาคม'] ?? 0) + 1;
+          break;
+      }
+    }
+
+    return monthCounts;
   }
 
   Map<String, int> processDataByType(List<dynamic> reports) {
@@ -91,100 +159,143 @@ class _DashbordState extends State<Dashbord> {
             Expanded(
               flex: 8,
               child: Card(
-                elevation: 4,
+                elevation: 6,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: FutureBuilder<List<dynamic>>(
-                    future: fetchReports(),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const Center(child: CircularProgressIndicator());
-                      } else if (snapshot.hasError) {
-                        return Center(
-                          child: Text(
-                            "Error: ${snapshot.error}",
-                            style: const TextStyle(color: Colors.red),
-                          ),
-                        );
-                      } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                        return const Center(
-                          child: Text(
-                            "ไม่มีข้อมูลการแจ้งซ่อม",
-                            style: TextStyle(fontSize: 18),
-                          ),
-                        );
-                      } else {
-                        final reports = snapshot.data!;
-                        final typeData = processDataByType(reports);
-                        final statusData = processDataByStatus(reports);
+                child: SingleChildScrollView(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // ปุ่มเลือกปี
+                        _buildYearSelector(),
+                        const SizedBox(height: 20),
+                        FutureBuilder<List<dynamic>>(
+                          future: fetchReports(),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return const Center(
+                                  child: CircularProgressIndicator());
+                            } else if (snapshot.hasError) {
+                              return Center(
+                                child: Text(
+                                  "Error: ${snapshot.error}",
+                                  style: const TextStyle(color: Colors.red),
+                                ),
+                              );
+                            } else if (!snapshot.hasData ||
+                                snapshot.data!.isEmpty) {
+                              return const Center(
+                                child: Text(
+                                  "ไม่มีข้อมูลการแจ้งซ่อม",
+                                  style: TextStyle(fontSize: 18),
+                                ),
+                              );
+                            } else {
+                              final reports = snapshot.data!;
+                              final typeData = processDataByType(reports);
+                              final statusData = processDataByStatus(reports);
 
-                        return SingleChildScrollView(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              _buildSectionTitle("จำนวนการแจ้งซ่อม"),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                              return Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Expanded(
-                                    flex: 5,
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        // เพิ่มข้อความที่คุณต้องการ
-                                        const Text(
-                                          "ประเภท",
-                                          style: TextStyle(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.black87,
-                                          ),
+                                  _buildSectionTitle(
+                                      "จำนวนการแจ้งซ่อมแต่ละเดือน"),
+                                  const SizedBox(height: 16),
+                                  _buildBarChart(processDataByMonth(reports)),
+                                  const SizedBox(height: 20),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Expanded(
+                                        flex: 5,
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            const Text(
+                                              "ประเภท",
+                                              style: TextStyle(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.black87,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 16),
+                                            _buildBarChart(typeData),
+                                          ],
                                         ),
-                                        const SizedBox(height: 16),
-                                        _buildBarChart(typeData),
-                                      ],
-                                    ),
-                                  ),
-                                  const SizedBox(width: 30),
-                                  Expanded(
-                                    flex: 5,
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        const SizedBox(height: 60),
-                                        // เพิ่มข้อความที่คุณต้องการ
-                                        const Text(
-                                          "สถานะ",
-                                          style: TextStyle(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.black87,
-                                          ),
+                                      ),
+                                      const SizedBox(width: 30),
+                                      Expanded(
+                                        flex: 5,
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            const SizedBox(height: 60),
+                                            const Text(
+                                              "สถานะ",
+                                              style: TextStyle(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.black87,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 16),
+                                            _buildPieChart(statusData),
+                                          ],
                                         ),
-                                        const SizedBox(height: 16),
-                                        _buildPieChart(statusData),
-                                      ],
-                                    ),
-                                  ),
+                                      ),
+                                    ],
+                                  )
                                 ],
-                              )
-                            ],
-                          ),
-                        );
-                      }
-                    },
+                              );
+                            }
+                          },
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildYearSelector() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Row(
+        children: [
+          const Text(
+            "เลือกปี:",
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(width: 8),
+          DropdownButton<String>(
+            value: selectedYear,
+            onChanged: (String? newYear) {
+              setState(() {
+                selectedYear = newYear!;
+              });
+            },
+            items: List.generate(5, (index) {
+              int year = DateTime.now().year - index;
+              return DropdownMenuItem<String>(
+                value: year.toString(),
+                child: Text(year.toString()),
+              );
+            }),
+          ),
+        ],
       ),
     );
   }
@@ -201,6 +312,11 @@ class _DashbordState extends State<Dashbord> {
   }
 
   Widget _buildBarChart(Map<String, int> data) {
+    final maxValue = data.values.isNotEmpty
+        ? data.values.reduce((a, b) => a > b ? a : b)
+        : 0;
+    final interval = (maxValue / 5).ceil(); // คำนวณช่วงระยะห่างจากค่ามากสุด
+
     return SizedBox(
       height: 300,
       child: BarChart(
@@ -222,7 +338,8 @@ class _DashbordState extends State<Dashbord> {
             leftTitles: AxisTitles(
               sideTitles: SideTitles(
                 showTitles: true,
-                interval: 1, // กำหนด interval เป็น 1 เพื่อให้แสดงเฉพาะจำนวนเต็ม
+                interval:
+                    interval.toDouble(), // กำหนดช่วงระยะห่างของตัวเลขฝั่งซ้าย
                 getTitlesWidget: (value, meta) {
                   return Text(
                     value.toInt().toString(),
@@ -247,14 +364,13 @@ class _DashbordState extends State<Dashbord> {
               ),
             ),
             topTitles: AxisTitles(
-              sideTitles: SideTitles(showTitles: false), // ซ่อนตัวเลขด้านบนกราฟ
+              sideTitles: SideTitles(showTitles: false),
             ),
             rightTitles: AxisTitles(
-              sideTitles:
-                  SideTitles(showTitles: false), // ซ่อนตัวเลขด้านขวากราฟ
+              sideTitles: SideTitles(showTitles: false),
             ),
           ),
-          gridData: FlGridData(show: true), // ซ่อนเส้น grid
+          gridData: FlGridData(show: true),
         ),
       ),
     );
@@ -264,41 +380,38 @@ class _DashbordState extends State<Dashbord> {
     return Column(
       children: [
         SizedBox(
-          height: 300, // เพิ่มขนาดวงกลม
+          height: 300,
           child: PieChart(
             PieChartData(
               sections: data.entries.map((entry) {
-                // กำหนดสีตามสถานะ
                 Color sectionColor;
                 switch (entry.key) {
                   case 'รอดำเนินการ':
-                    sectionColor = Colors.orange[300]!; // ส้ม
+                    sectionColor = Colors.orange[300]!;
                     break;
                   case 'กำลังดำเนินการ':
-                    sectionColor = Colors.blue[300]!; // น้ำเงิน
+                    sectionColor = Colors.blue[300]!;
                     break;
                   case 'เสร็จสิ้น':
-                    sectionColor = Colors.green[300]!; // เขียว
+                    sectionColor = Colors.green[300]!;
                     break;
-
                   default:
-                    sectionColor = Colors.grey[300]!; // สีเริ่มต้น
+                    sectionColor = Colors.grey[300]!;
                 }
 
                 return PieChartSectionData(
-                  title: '', // ซ่อนข้อความในวงกลม
+                  title: '',
                   value: entry.value.toDouble(),
-                  color: sectionColor, // ใช้สีที่กำหนด
-                  radius: 150, // ปรับขนาดของวงกลม
+                  color: sectionColor,
+                  radius: 150,
                 );
               }).toList(),
-              sectionsSpace: 2, // ไม่มีช่องว่างระหว่างส่วนต่าง ๆ
-              centerSpaceRadius: 2, // เพิ่มช่องว่างตรงกลาง
+              sectionsSpace: 2,
+              centerSpaceRadius: 2,
             ),
           ),
         ),
         const SizedBox(height: 16),
-        // ส่วนแสดงคำอธิบายสีและประเภท
         Wrap(
           spacing: 8.0,
           runSpacing: 4.0,
