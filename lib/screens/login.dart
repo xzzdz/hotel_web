@@ -140,12 +140,12 @@ class _LoginState extends State<Login> {
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
                                 Image.asset(
-                                  'assets/img/2.png',
+                                  'assets/img/111.png',
                                   width: 300,
                                 ),
                                 const SizedBox(height: 10),
                                 Text(
-                                  'หากต้องการใช้หน้านี้ต่อไป',
+                                  'แอปพลิเคชันระบบแจ้งซ่อม',
                                   style: TextStyle(
                                     fontSize: 16,
                                     color: Colors.grey,
@@ -154,7 +154,7 @@ class _LoginState extends State<Login> {
                                   ),
                                 ),
                                 Text(
-                                  'กรุณาลงชื่อเข้าใช้',
+                                  'โรงแรมเดอะแคนนาส เชียงใหม่',
                                   style: TextStyle(
                                     fontSize: 16,
                                     color: Colors.grey,
@@ -171,12 +171,12 @@ class _LoginState extends State<Login> {
                       ] else ...[
                         // แสดง Column สำหรับหน้าจอเล็ก
                         Image.asset(
-                          'assets/img/2.png',
+                          'assets/img/111.png',
                           width: 200, // ลดขนาดโลโก้ในหน้าจอเล็ก
                         ),
                         const SizedBox(height: 10),
                         Text(
-                          'หากต้องการใช้หน้านี้ต่อไป',
+                          'แอปพลิเคชันระบบแจ้งซ่อม',
                           style: TextStyle(
                             fontSize: 16,
                             color: Colors.grey,
@@ -185,7 +185,7 @@ class _LoginState extends State<Login> {
                           ),
                         ),
                         Text(
-                          'กรุณาลงชื่อเข้าใช้',
+                          'โรงแรมเดอะแคนนาส เชียงใหม่',
                           style: TextStyle(
                             fontSize: 16,
                             color: Colors.grey,

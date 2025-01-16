@@ -31,40 +31,24 @@ class _DashbordState extends State<Dashbord> {
     }
   }
 
-  // ฟังก์ชั่นที่แยกเดือนและนับจำนวนการซ่อมในแต่ละเดือนตามสถานะ
-  Map<String, Map<String, int>> processDataByMonthAndStatus(
-      List<dynamic> reports) {
-    Map<String, Map<String, int>> data = {};
-
+  Map<String, int> processDataByType(List<dynamic> reports) {
+    Map<String, int> typeCounts = {};
     for (var report in reports) {
-      String date = report['date']; // วันที่ที่เก็บในฐานข้อมูล
-      String month = date.substring(5, 7); // เอาแค่เดือนจากวันที่
-      String status = report['status']; // สถานะการซ่อม
-
-      // ถ้ายังไม่มีข้อมูลเดือนนี้ใน data ให้สร้างใหม่
-      if (!data.containsKey(month)) {
-        data[month] = {
-          'รอดำเนินการ': 0,
-          'กำลังดำเนินการ': 0,
-          'เสร็จสิ้น': 0,
-        };
-      }
-
-      // เพิ่มจำนวนตามสถานะ
-      if (status == 'รอดำเนินการ') {
-        data[month]!['รอดำเนินการ'] = (data[month]!['รอดำเนินการ'] ?? 0) + 1;
-      } else if (status == 'กำลังดำเนินการ') {
-        data[month]!['กำลังดำเนินการ'] =
-            (data[month]!['กำลังดำเนินการ'] ?? 0) + 1;
-      } else if (status == 'เสร็จสิ้น') {
-        data[month]!['เสร็จสิ้น'] = (data[month]!['เสร็จสิ้น'] ?? 0) + 1;
-      }
+      String type = report['type'];
+      typeCounts[type] = (typeCounts[type] ?? 0) + 1;
     }
-
-    return data;
+    return typeCounts;
   }
 
-  // ฟังก์ชันในการดึงชื่อผู้ใช้จาก SharedPreferences
+  Map<String, int> processDataByStatus(List<dynamic> reports) {
+    Map<String, int> statusCounts = {};
+    for (var report in reports) {
+      String status = report['status'];
+      statusCounts[status] = (statusCounts[status] ?? 0) + 1;
+    }
+    return statusCounts;
+  }
+
   Future<void> _loadUserName() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
@@ -82,16 +66,19 @@ class _DashbordState extends State<Dashbord> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey[200],
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Sidebar
             Expanded(
               flex: 2,
               child: Card(
                 elevation: 4,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
                 child: Sidebar(
                   username: username,
                   role: role,
@@ -100,12 +87,14 @@ class _DashbordState extends State<Dashbord> {
                 ),
               ),
             ),
-
-            // Dashboard Content
+            const SizedBox(width: 16),
             Expanded(
               flex: 8,
               child: Card(
                 elevation: 4,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: FutureBuilder<List<dynamic>>(
@@ -129,204 +118,62 @@ class _DashbordState extends State<Dashbord> {
                         );
                       } else {
                         final reports = snapshot.data!;
-                        final monthlyData =
-                            processDataByMonthAndStatus(reports);
+                        final typeData = processDataByType(reports);
+                        final statusData = processDataByStatus(reports);
 
                         return SingleChildScrollView(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              // ข้อมูลกราฟแท่ง
-                              const Text(
-                                "กราฟแท่งจำนวนการแจ้งซ่อมตามเดือน",
-                                style: TextStyle(
-                                    fontSize: 24, fontWeight: FontWeight.bold),
-                              ),
-                              const SizedBox(height: 8.0),
-                              const Divider(thickness: 1.5),
-                              const SizedBox(height: 16.0),
-
-                              // แสดงกราฟแท่ง
-                              SizedBox(
-                                height: 300,
-                                child: BarChart(BarChartData(
-                                  borderData: FlBorderData(show: false),
-                                  titlesData: FlTitlesData(
-                                    leftTitles: AxisTitles(
-                                      axisNameSize: 16,
-                                      sideTitles: SideTitles(showTitles: false),
-                                    ),
-                                    bottomTitles: AxisTitles(
-                                      axisNameSize: 16,
-                                      sideTitles: SideTitles(
-                                        showTitles: true,
-                                        getTitlesWidget: (value, meta) {
-                                          List<String> months = [
-                                            "มกราคม",
-                                            "กุมภาพันธ์",
-                                            "มีนาคม",
-                                            "เมษายน",
-                                            "พฤษภาคม",
-                                            "มิถุนายน",
-                                            "กรกฎาคม",
-                                            "สิงหาคม",
-                                            "กันยายน",
-                                            "ตุลาคม",
-                                            "พฤศจิกายน",
-                                            "ธันวาคม"
-                                          ];
-                                          String month =
-                                              months[value.toInt() - 1];
-                                          return Text(month,
-                                              style: TextStyle(fontSize: 14));
-                                        },
-                                      ),
-                                    ),
-                                  ),
-                                  gridData: FlGridData(
-                                      show: true, drawVerticalLine: false),
-                                  barGroups: monthlyData.entries.map((entry) {
-                                    String month = entry.key;
-                                    Map<String, int> statusData = entry.value;
-
-                                    // กำหนดสีแท่งกราฟแต่ละเดือน
-                                    Color getColorForMonth(String month) {
-                                      switch (month) {
-                                        case '01':
-                                          return Colors.red; // มกราคม
-                                        case '02':
-                                          return Colors.blue; // กุมภาพันธ์
-                                        case '03':
-                                          return Colors.green; // มีนาคม
-                                        case '04':
-                                          return Colors.yellow; // เมษายน
-                                        case '05':
-                                          return Colors.orange; // พฤษภาคม
-                                        case '06':
-                                          return Colors.purple; // มิถุนายน
-                                        case '07':
-                                          return Colors.cyan; // กรกฎาคม
-                                        case '08':
-                                          return Colors.teal; // สิงหาคม
-                                        case '09':
-                                          return Colors.indigo; // กันยายน
-                                        case '10':
-                                          return Colors.brown; // ตุลาคม
-                                        case '11':
-                                          return Colors.pink; // พฤศจิกายน
-                                        case '12':
-                                          return Colors.lime; // ธันวาคม
-                                        default:
-                                          return Colors.grey; // เดือนอื่น ๆ
-                                      }
-                                    }
-
-                                    return BarChartGroupData(
-                                      x: int.parse(month),
-                                      barRods: [
-                                        BarChartRodData(
-                                          toY: statusData.values
-                                              .fold(0,
-                                                  (prev, curr) => prev + curr)
-                                              .toDouble(),
-                                          color: getColorForMonth(
-                                              month), // ใช้สีตามเดือน
-                                          width: 16,
-                                          borderRadius:
-                                              BorderRadius.circular(4),
+                              _buildSectionTitle("จำนวนการแจ้งซ่อม"),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Expanded(
+                                    flex: 5,
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        // เพิ่มข้อความที่คุณต้องการ
+                                        const Text(
+                                          "ประเภท",
+                                          style: TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black87,
+                                          ),
                                         ),
+                                        const SizedBox(height: 16),
+                                        _buildBarChart(typeData),
                                       ],
-                                    );
-                                  }).toList(),
-                                  alignment: BarChartAlignment.spaceAround,
-                                )),
-                              ),
-                              const SizedBox(height: 16),
-
-                              // ข้อมูลสถานะการแจ้งซ่อม
-                              const Text(
-                                "รายงานสรุปการแจ้งซ่อม",
-                                style: TextStyle(
-                                    fontSize: 24, fontWeight: FontWeight.bold),
-                              ),
-                              const SizedBox(height: 8.0),
-                              const Divider(thickness: 1.5),
-                              const SizedBox(height: 16.0),
-                              // รายงานการแจ้งซ่อมที่ยังไม่ได้ดำเนินการ
-                              Card(
-                                elevation: 4,
-                                child: ListTile(
-                                  title: const Text(
-                                    "รอดำเนินการ",
-                                    style: TextStyle(
-                                      fontFamily: Font_.Fonts_T,
                                     ),
                                   ),
-                                  subtitle: Text(
-                                    "จำนวน: ${monthlyData.values.fold(0, (prev, element) => prev + (element['รอดำเนินการ'] ?? 0))} รายการ",
-                                    style: TextStyle(
-                                      fontFamily: Font_.Fonts_T,
+                                  const SizedBox(width: 30),
+                                  Expanded(
+                                    flex: 5,
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        const SizedBox(height: 60),
+                                        // เพิ่มข้อความที่คุณต้องการ
+                                        const Text(
+                                          "สถานะ",
+                                          style: TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black87,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 16),
+                                        _buildPieChart(statusData),
+                                      ],
                                     ),
                                   ),
-                                ),
-                              ),
-
-                              // รายงานการแจ้งซ่อมที่กำลังดำเนินการ
-                              Card(
-                                elevation: 4,
-                                child: ListTile(
-                                  title: const Text(
-                                    "กำลังดำเนินการ",
-                                    style: TextStyle(
-                                      fontFamily: Font_.Fonts_T,
-                                    ),
-                                  ),
-                                  subtitle: Text(
-                                    "จำนวน: ${monthlyData.values.fold(0, (prev, element) => prev + (element['กำลังดำเนินการ'] ?? 0))} รายการ",
-                                    style: TextStyle(
-                                      fontFamily: Font_.Fonts_T,
-                                    ),
-                                  ),
-                                ),
-                              ),
-
-                              // รายงานการแจ้งซ่อมที่เสร็จสมบูรณ์
-                              Card(
-                                elevation: 4,
-                                child: ListTile(
-                                  title: const Text(
-                                    "เสร็จสิ้น",
-                                    style: TextStyle(
-                                      fontFamily: Font_.Fonts_T,
-                                    ),
-                                  ),
-                                  subtitle: Text(
-                                    "จำนวน: ${monthlyData.values.fold(0, (prev, element) => prev + (element['เสร็จสิ้น'] ?? 0))} รายการ",
-                                    style: TextStyle(
-                                      fontFamily: Font_.Fonts_T,
-                                    ),
-                                  ),
-                                ),
-                              ),
-
-                              // รายงานการแจ้งซ่อมทั้งหมด
-                              Card(
-                                elevation: 4,
-                                child: ListTile(
-                                  title: const Text(
-                                    "ทั้งหมด",
-                                    style: TextStyle(
-                                      fontFamily: Font_.Fonts_T,
-                                    ),
-                                  ),
-                                  subtitle: Text(
-                                    "จำนวน: ${monthlyData.values.fold(0, (prev, element) => prev + ((element['รอดำเนินการ'] ?? 0) + (element['กำลังดำเนินการ'] ?? 0) + (element['เสร็จสิ้น'] ?? 0)))} รายการ",
-                                    style: TextStyle(
-                                      fontFamily: Font_.Fonts_T,
-                                    ),
-                                  ),
-                                ),
-                              ),
+                                ],
+                              )
                             ],
                           ),
                         );
@@ -339,6 +186,159 @@ class _DashbordState extends State<Dashbord> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildSectionTitle(String title) {
+    return Text(
+      title,
+      style: const TextStyle(
+        fontSize: 24,
+        fontWeight: FontWeight.bold,
+        color: Colors.black87,
+      ),
+    );
+  }
+
+  Widget _buildBarChart(Map<String, int> data) {
+    return SizedBox(
+      height: 300,
+      child: BarChart(
+        BarChartData(
+          barGroups: data.entries.map((entry) {
+            final index = data.keys.toList().indexOf(entry.key);
+            return BarChartGroupData(
+              x: index,
+              barRods: [
+                BarChartRodData(
+                  toY: entry.value.toDouble(),
+                  color: Colors.primaries[index % Colors.primaries.length],
+                  width: 24,
+                ),
+              ],
+            );
+          }).toList(),
+          titlesData: FlTitlesData(
+            leftTitles: AxisTitles(
+              sideTitles: SideTitles(
+                showTitles: true,
+                interval: 1, // กำหนด interval เป็น 1 เพื่อให้แสดงเฉพาะจำนวนเต็ม
+                getTitlesWidget: (value, meta) {
+                  return Text(
+                    value.toInt().toString(),
+                    style: const TextStyle(fontSize: 14),
+                  );
+                },
+              ),
+            ),
+            bottomTitles: AxisTitles(
+              sideTitles: SideTitles(
+                showTitles: true,
+                getTitlesWidget: (value, meta) {
+                  final keys = data.keys.toList();
+                  if (value.toInt() < 0 || value.toInt() >= keys.length) {
+                    return const Text('');
+                  }
+                  return Text(
+                    keys[value.toInt()],
+                    style: const TextStyle(fontSize: 16),
+                  );
+                },
+              ),
+            ),
+            topTitles: AxisTitles(
+              sideTitles: SideTitles(showTitles: false), // ซ่อนตัวเลขด้านบนกราฟ
+            ),
+            rightTitles: AxisTitles(
+              sideTitles:
+                  SideTitles(showTitles: false), // ซ่อนตัวเลขด้านขวากราฟ
+            ),
+          ),
+          gridData: FlGridData(show: true), // ซ่อนเส้น grid
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPieChart(Map<String, int> data) {
+    return Column(
+      children: [
+        SizedBox(
+          height: 300, // เพิ่มขนาดวงกลม
+          child: PieChart(
+            PieChartData(
+              sections: data.entries.map((entry) {
+                // กำหนดสีตามสถานะ
+                Color sectionColor;
+                switch (entry.key) {
+                  case 'รอดำเนินการ':
+                    sectionColor = Colors.orange[300]!; // ส้ม
+                    break;
+                  case 'กำลังดำเนินการ':
+                    sectionColor = Colors.blue[300]!; // น้ำเงิน
+                    break;
+                  case 'เสร็จสิ้น':
+                    sectionColor = Colors.green[300]!; // เขียว
+                    break;
+
+                  default:
+                    sectionColor = Colors.grey[300]!; // สีเริ่มต้น
+                }
+
+                return PieChartSectionData(
+                  title: '', // ซ่อนข้อความในวงกลม
+                  value: entry.value.toDouble(),
+                  color: sectionColor, // ใช้สีที่กำหนด
+                  radius: 150, // ปรับขนาดของวงกลม
+                );
+              }).toList(),
+              sectionsSpace: 2, // ไม่มีช่องว่างระหว่างส่วนต่าง ๆ
+              centerSpaceRadius: 2, // เพิ่มช่องว่างตรงกลาง
+            ),
+          ),
+        ),
+        const SizedBox(height: 16),
+        // ส่วนแสดงคำอธิบายสีและประเภท
+        Wrap(
+          spacing: 8.0,
+          runSpacing: 4.0,
+          children: data.entries.map((entry) {
+            Color sectionColor;
+            switch (entry.key) {
+              case 'รอดำเนินการ':
+                sectionColor = Colors.orange;
+                break;
+              case 'กำลังดำเนินการ':
+                sectionColor = Colors.blue;
+                break;
+              case 'เสร็จสิ้น':
+                sectionColor = Colors.green;
+                break;
+              default:
+                sectionColor = Colors.grey;
+            }
+
+            return Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 16,
+                  height: 16,
+                  decoration: BoxDecoration(
+                    color: sectionColor,
+                    shape: BoxShape.rectangle,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  "${entry.key} (${entry.value})",
+                  style: const TextStyle(fontSize: 16),
+                ),
+              ],
+            );
+          }).toList(),
+        ),
+      ],
     );
   }
 
