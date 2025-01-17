@@ -4,6 +4,7 @@ import 'package:hotel_web/constant/color_font.dart';
 import 'package:hotel_web/screens/profile.dart';
 
 import '../screens/add_report.dart';
+import '../screens/add_type.dart';
 import '../screens/dashbord.dart';
 import '../screens/manageusers.dart';
 import '../screens/home.dart';
@@ -121,6 +122,20 @@ class Sidebar extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                   builder: (context) => const AddReport(),
+                ),
+              );
+            },
+          ),
+          const Divider(),
+          ListTile(
+            leading: const Icon(Icons.border_color),
+            title: const Text("เพิ่มประเภทการแจ้งซ่อม",
+                style: TextStyle(fontFamily: Font_.Fonts_T)),
+            onTap: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const AddType(),
                 ),
               );
             },

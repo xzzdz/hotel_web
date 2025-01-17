@@ -138,250 +138,265 @@ class _ProfileState extends State<Profile> {
 
               Expanded(
                 flex: 8,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start, // ชิดซ้าย
-                  children: [
-                    const SizedBox(height: 8.0),
-                    const Padding(
-                      padding: EdgeInsets.only(left: 10),
-                      child: Text(
-                        'โปรไฟล์',
-                        style: TextStyle(
-                          fontSize: 26,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: Font_.Fonts_T,
-                          color: Colors.black87,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 8.0),
-                    const Divider(thickness: 1.5),
-                    const SizedBox(height: 16.0),
-                    Center(
-                      child: Container(
-                        width: 150, // ขนาดของรูปโปรไฟล์
-                        height: 150,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle, // รูปแบบวงกลม
-                          image: const DecorationImage(
-                            image: AssetImage('assets/img/runnerx.png'),
-                            fit: BoxFit.cover, // ปรับรูปให้เต็มพื้นที่
-                          ),
-                          border: Border.all(
-                            color: bottoncolor, // ขอบสีขาว
-                            width: 3, // ความหนาของขอบ
+                child: Card(
+                  elevation: 4,
+                  margin: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start, // ชิดซ้าย
+                      children: [
+                        const SizedBox(height: 8.0),
+                        const Padding(
+                          padding: EdgeInsets.only(left: 10),
+                          child: Text(
+                            'โปรไฟล์',
+                            style: TextStyle(
+                              fontSize: 26,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: Font_.Fonts_T,
+                              color: Colors.black87,
+                            ),
                           ),
                         ),
-                      ),
-                    ),
-                    const SizedBox(height: 30),
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start, // ชิดซ้าย
-                        children: [
-                          const Text(
-                            'ชื่อ - นามสกุล',
-                            style: TextStyle(
-                              fontFamily: Font_.Fonts_T,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black87,
+                        const SizedBox(height: 8.0),
+                        const Divider(thickness: 1.5),
+                        const SizedBox(height: 16.0),
+                        Center(
+                          child: Container(
+                            width: 150, // ขนาดของรูปโปรไฟล์
+                            height: 150,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle, // รูปแบบวงกลม
+                              image: const DecorationImage(
+                                image: AssetImage('assets/img/runnerx.png'),
+                                fit: BoxFit.cover, // ปรับรูปให้เต็มพื้นที่
+                              ),
+                              border: Border.all(
+                                color: bottoncolor, // ขอบสีขาว
+                                width: 3, // ความหนาของขอบ
+                              ),
                             ),
                           ),
-                          const SizedBox(height: 8),
-                          Text(
-                            username ?? '-',
-                            style: const TextStyle(
-                              fontFamily: Font_.Fonts_T,
-                              fontSize: 16,
-                              color: Colors.black87,
-                            ),
+                        ),
+                        const SizedBox(height: 30),
+                        Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            crossAxisAlignment:
+                                CrossAxisAlignment.start, // ชิดซ้าย
+                            children: [
+                              const Text(
+                                'ชื่อ - นามสกุล',
+                                style: TextStyle(
+                                  fontFamily: Font_.Fonts_T,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black87,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                username ?? '-',
+                                style: const TextStyle(
+                                  fontFamily: Font_.Fonts_T,
+                                  fontSize: 16,
+                                  color: Colors.black87,
+                                ),
+                              ),
+                              const SizedBox(height: 16),
+                              const Text(
+                                'ตำแหน่ง:',
+                                style: TextStyle(
+                                  fontFamily: Font_.Fonts_T,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black87,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                role ?? '-',
+                                style: const TextStyle(
+                                  fontFamily: Font_.Fonts_T,
+                                  fontSize: 16,
+                                  color: Colors.black87,
+                                ),
+                              ),
+                              const SizedBox(height: 16),
+                              const Text(
+                                'ชื่อผู้ใช้งาน:',
+                                style: TextStyle(
+                                  fontFamily: Font_.Fonts_T,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black87,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                email ?? '-',
+                                style: const TextStyle(
+                                  fontFamily: Font_.Fonts_T,
+                                  fontSize: 16,
+                                  color: Colors.black87,
+                                ),
+                              ),
+                            ],
                           ),
-                          const SizedBox(height: 16),
-                          const Text(
-                            'ตำแหน่ง:',
-                            style: TextStyle(
-                              fontFamily: Font_.Fonts_T,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black87,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            role ?? '-',
-                            style: const TextStyle(
-                              fontFamily: Font_.Fonts_T,
-                              fontSize: 16,
-                              color: Colors.black87,
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-                          const Text(
-                            'ชื่อผู้ใช้งาน:',
-                            style: TextStyle(
-                              fontFamily: Font_.Fonts_T,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black87,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            email ?? '-',
-                            style: const TextStyle(
-                              fontFamily: Font_.Fonts_T,
-                              fontSize: 16,
-                              color: Colors.black87,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Container(
-                      alignment: Alignment.bottomRight,
-                      child: FloatingActionButton(
-                        onPressed: () {
-                          showDialog(
-                            context: context,
-                            builder: (context) {
-                              bool dialogObscureText =
-                                  _obscureText; // ใช้ตัวแปรแยกใน dialog
-                              return StatefulBuilder(
-                                builder: (context, setDialogState) {
-                                  return AlertDialog(
-                                    title: const Text('แก้ไขผู้ใช้งาน'),
-                                    content: Form(
-                                      key: formKey,
-                                      child: Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          // ชื่อผู้ใช้งาน
-                                          TextFormField(
-                                            controller: nameController,
-                                            decoration: const InputDecoration(
-                                              labelText: 'ชื่อ - นามสกุล',
-                                              hintText: 'ใส่ชื่อ - นามสกุล',
-                                              border: UnderlineInputBorder(),
-                                            ),
-                                            validator: (value) {
-                                              if (value == null ||
-                                                  value.trim().isEmpty) {
-                                                return 'กรุณาใส่ชื่อ - นามสกุล';
-                                              }
-                                              return null;
-                                            },
-                                          ),
-
-                                          const SizedBox(height: 8.0),
-
-                                          // อีเมลผู้ใช้งาน
-                                          TextFormField(
-                                            controller: emailController,
-                                            decoration: const InputDecoration(
-                                              labelText: 'ชื่อผู้ใช้งาน',
-                                              hintText: 'ใส่ชื่อผู้ใช้งาน',
-                                              border: UnderlineInputBorder(),
-                                            ),
-                                            validator: (value) {
-                                              if (value == null ||
-                                                  value.trim().isEmpty) {
-                                                return 'กรุณาใส่ชื่อผู้ใช้งาน';
-                                              }
-                                              return null;
-                                            },
-                                          ),
-
-                                          const SizedBox(height: 8.0),
-
-                                          // ตำแหน่งงานผู้ใช้งาน (ไม่สามารถเลือกได้)
-                                          TextFormField(
-                                            controller: roleController,
-                                            readOnly: true, // ปิดไม่ให้เลือก
-                                            decoration: const InputDecoration(
-                                              labelText: 'ตำแหน่งงาน',
-                                              border: UnderlineInputBorder(),
-                                            ),
-                                          ),
-
-                                          const SizedBox(height: 8.0),
-
-                                          // รหัสผ่านใหม่
-                                          TextFormField(
-                                            controller: passwordController,
-                                            obscureText: dialogObscureText,
-                                            decoration: InputDecoration(
-                                              labelText: 'รหัสผ่านใหม่',
-                                              hintText: 'ใส่รหัสผ่านใหม่',
-                                              suffixIcon: IconButton(
-                                                icon: Icon(
-                                                  dialogObscureText
-                                                      ? Icons.visibility_off
-                                                      : Icons.visibility,
+                        ),
+                        Container(
+                          alignment: Alignment.bottomRight,
+                          child: FloatingActionButton(
+                            onPressed: () {
+                              showDialog(
+                                context: context,
+                                builder: (context) {
+                                  bool dialogObscureText =
+                                      _obscureText; // ใช้ตัวแปรแยกใน dialog
+                                  return StatefulBuilder(
+                                    builder: (context, setDialogState) {
+                                      return AlertDialog(
+                                        title: const Text('แก้ไขผู้ใช้งาน'),
+                                        content: Form(
+                                          key: formKey,
+                                          child: Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              // ชื่อผู้ใช้งาน
+                                              TextFormField(
+                                                controller: nameController,
+                                                decoration:
+                                                    const InputDecoration(
+                                                  labelText: 'ชื่อ - นามสกุล',
+                                                  hintText: 'ใส่ชื่อ - นามสกุล',
+                                                  border:
+                                                      UnderlineInputBorder(),
                                                 ),
-                                                onPressed: () {
-                                                  setDialogState(() {
-                                                    dialogObscureText =
-                                                        !dialogObscureText;
-                                                  });
+                                                validator: (value) {
+                                                  if (value == null ||
+                                                      value.trim().isEmpty) {
+                                                    return 'กรุณาใส่ชื่อ - นามสกุล';
+                                                  }
+                                                  return null;
                                                 },
                                               ),
-                                            ),
+
+                                              const SizedBox(height: 8.0),
+
+                                              // อีเมลผู้ใช้งาน
+                                              TextFormField(
+                                                controller: emailController,
+                                                decoration:
+                                                    const InputDecoration(
+                                                  labelText: 'ชื่อผู้ใช้งาน',
+                                                  hintText: 'ใส่ชื่อผู้ใช้งาน',
+                                                  border:
+                                                      UnderlineInputBorder(),
+                                                ),
+                                                validator: (value) {
+                                                  if (value == null ||
+                                                      value.trim().isEmpty) {
+                                                    return 'กรุณาใส่ชื่อผู้ใช้งาน';
+                                                  }
+                                                  return null;
+                                                },
+                                              ),
+
+                                              const SizedBox(height: 8.0),
+
+                                              // ตำแหน่งงานผู้ใช้งาน (ไม่สามารถเลือกได้)
+                                              TextFormField(
+                                                controller: roleController,
+                                                readOnly:
+                                                    true, // ปิดไม่ให้เลือก
+                                                decoration:
+                                                    const InputDecoration(
+                                                  labelText: 'ตำแหน่งงาน',
+                                                  border:
+                                                      UnderlineInputBorder(),
+                                                ),
+                                              ),
+
+                                              const SizedBox(height: 8.0),
+
+                                              // รหัสผ่านใหม่
+                                              TextFormField(
+                                                controller: passwordController,
+                                                obscureText: dialogObscureText,
+                                                decoration: InputDecoration(
+                                                  labelText: 'รหัสผ่านใหม่',
+                                                  hintText: 'ใส่รหัสผ่านใหม่',
+                                                  suffixIcon: IconButton(
+                                                    icon: Icon(
+                                                      dialogObscureText
+                                                          ? Icons.visibility_off
+                                                          : Icons.visibility,
+                                                    ),
+                                                    onPressed: () {
+                                                      setDialogState(() {
+                                                        dialogObscureText =
+                                                            !dialogObscureText;
+                                                      });
+                                                    },
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        actions: [
+                                          TextButton(
+                                            child: const Text('ยกเลิก'),
+                                            onPressed: () =>
+                                                Navigator.of(context).pop(),
+                                          ),
+                                          TextButton(
+                                            child: const Text('บันทึก'),
+                                            onPressed: () async {
+                                              // ตรวจสอบว่าฟอร์มถูกต้องหรือไม่
+                                              if (formKey.currentState!
+                                                  .validate()) {
+                                                // ส่งข้อมูลไปแก้ไข
+
+                                                editUser(users[0]['id']);
+                                                // Navigator.of(context).pop();
+                                                Navigator.of(context)
+                                                    .pop(); // ปิด dialog ก่อน
+                                                SharedPreferences prefs =
+                                                    await SharedPreferences
+                                                        .getInstance();
+                                                await prefs
+                                                    .clear(); // ลบข้อมูลทั้งหมด หรือใช้ prefs.remove('name') เพื่อลบเฉพาะค่า
+                                                Navigator.pushReplacement(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        const Login(),
+                                                  ),
+                                                );
+                                              }
+                                            },
                                           ),
                                         ],
-                                      ),
-                                    ),
-                                    actions: [
-                                      TextButton(
-                                        child: const Text('ยกเลิก'),
-                                        onPressed: () =>
-                                            Navigator.of(context).pop(),
-                                      ),
-                                      TextButton(
-                                        child: const Text('บันทึก'),
-                                        onPressed: () async {
-                                          // ตรวจสอบว่าฟอร์มถูกต้องหรือไม่
-                                          if (formKey.currentState!
-                                              .validate()) {
-                                            // ส่งข้อมูลไปแก้ไข
-
-                                            editUser(users[0]['id']);
-                                            // Navigator.of(context).pop();
-                                            Navigator.of(context)
-                                                .pop(); // ปิด dialog ก่อน
-                                            SharedPreferences prefs =
-                                                await SharedPreferences
-                                                    .getInstance();
-                                            await prefs
-                                                .clear(); // ลบข้อมูลทั้งหมด หรือใช้ prefs.remove('name') เพื่อลบเฉพาะค่า
-                                            Navigator.pushReplacement(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) =>
-                                                    const Login(),
-                                              ),
-                                            );
-                                          }
-                                        },
-                                      ),
-                                    ],
+                                      );
+                                    },
                                   );
                                 },
                               );
                             },
-                          );
-                        },
-                        backgroundColor: bottoncolor, // สีพื้นหลัง
-                        child: const Icon(
-                          Icons.settings, // ไอคอนเครื่องหมาย "+"
-                          color: Colors.white,
+                            backgroundColor: bottoncolor, // สีพื้นหลัง
+                            child: const Icon(
+                              Icons.settings,
+                              color: Colors.white,
+                            ),
+                            tooltip:
+                                'แก้ไขผู้ใช้', // ข้อความแสดงเมื่อวางเมาส์ (Desktop)
+                          ),
                         ),
-                        tooltip:
-                            'แก้ไขผู้ใช้', // ข้อความแสดงเมื่อวางเมาส์ (Desktop)
-                      ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
               ),
             ],

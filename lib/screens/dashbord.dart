@@ -444,7 +444,7 @@ class _DashbordState extends State<Dashbord> {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  "${entry.key} (${entry.value})",
+                  "${entry.key} ${entry.value}",
                   style: const TextStyle(fontSize: 16),
                 ),
               ],
