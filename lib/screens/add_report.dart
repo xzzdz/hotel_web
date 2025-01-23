@@ -1,4 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../constant/color_font.dart';
@@ -7,8 +11,6 @@ import 'home.dart';
 import 'login.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-
-import 'dart:html' as html;
 
 class AddReport extends StatefulWidget {
   const AddReport({super.key});
@@ -27,9 +29,6 @@ class _AddReportState extends State<AddReport> {
   String _selectedStatus = 'รอดำเนินการ';
   DateTime _selectedDate = DateTime.now();
 
-  // ตัวแปรสำหรับเก็บไฟล์รูปภาพ
-  html.File? _file;
-
   List<String> types = ['ไฟฟ้า', 'ประปา', 'สวน', 'แอร์', 'อื่นๆ'];
   List<String> statuses = ['รอดำเนินการ'];
 
@@ -42,72 +41,32 @@ class _AddReportState extends State<AddReport> {
     // print("Username: $username, Role: $role");
   }
 
-  // ฟังก์ชันสำหรับเลือกไฟล์ภาพ
-  Future<void> _pickImage() async {
-    final html.FileUploadInputElement uploadInput =
-        html.FileUploadInputElement();
-    uploadInput.accept = 'image/*';
-    uploadInput.click();
-
-    uploadInput.onChange.listen((e) async {
-      final files = uploadInput.files;
-      if (files!.isEmpty) return;
-
-      final file = files[0]; // เลือกไฟล์แรกจากรายการ
-      setState(() {
-        _file = file; // เก็บไฟล์ที่เลือก
-      });
-    });
-  }
-
-  // ฟังก์ชันสำหรับส่งข้อมูลรายงาน
   Future<void> _submitReport() async {
     if (_formKey.currentState!.validate()) {
       String url =
           "http://www.comdept.cmru.ac.th/64143168/hotel_app_php/add_report.php";
 
-      var request = http.MultipartRequest('POST', Uri.parse(url));
-      request.fields['username'] = username ?? '';
-      request.fields['date'] = _selectedDate.toIso8601String();
-      request.fields['type'] = _selectedType;
-      request.fields['status'] = _selectedStatus;
-      request.fields['detail'] = _detailController.text;
-      request.fields['location'] = _locationController.text;
+      // สร้างข้อมูลสำหรับส่ง
+      Map<String, String> data = {
+        'username': username ?? '',
+        'date': _selectedDate.toIso8601String(),
+        'type': _selectedType,
+        'status': _selectedStatus,
+        'detail': _detailController.text,
+        'location': _locationController.text,
+      };
 
-      if (_file != null) {
-        // เพิ่มไฟล์ใน MultipartRequest
-        final reader = html.FileReader();
-        reader.readAsArrayBuffer(_file!);
+      try {
+        // ส่งคำขอแบบ POST
+        final response = await http.post(
+          Uri.parse(url),
+          body: data,
+        );
 
-        reader.onLoadEnd.listen((e) async {
-          request.files.add(http.MultipartFile.fromBytes(
-            'image',
-            reader.result as List<int>,
-            filename: _file!.name,
-          ));
-
-          var response = await request.send();
-          if (response.statusCode == 200) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                  content: Text("บันทึกข้อมูลสำเร็จ!"),
-                  backgroundColor: Colors.green),
-            );
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => const HomepageWeb()),
-            );
-          } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text("เกิดข้อผิดพลาด: ${response.statusCode}")),
-            );
-          }
-        });
-      } else {
-        // ถ้าไม่มีไฟล์ ส่งแค่ข้อมูล
-        var response = await request.send();
+        // ตรวจสอบสถานะการตอบกลับ
         if (response.statusCode == 200) {
-          var responseData = json.decode(await response.stream.bytesToString());
+          var responseData = json.decode(response.body);
+
           if (responseData['success']) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
@@ -126,10 +85,14 @@ class _AddReportState extends State<AddReport> {
           }
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-                content: Text("เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์")),
+            SnackBar(content: Text("เกิดข้อผิดพลาด: ${response.statusCode}")),
           );
         }
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content: Text("เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์")),
+        );
       }
     }
   }
@@ -206,25 +169,6 @@ class _AddReportState extends State<AddReport> {
                               },
                             ),
                             const SizedBox(height: 16),
-                            // DropdownButtonFormField<String>(
-                            //   value: _selectedStatus,
-                            //   decoration: const InputDecoration(
-                            //     labelText: 'สถานะ',
-                            //     border: OutlineInputBorder(),
-                            //   ),
-                            //   items: statuses.map((status) {
-                            //     return DropdownMenuItem<String>(
-                            //       value: status,
-                            //       child: Text(status),
-                            //     );
-                            //   }).toList(),
-                            //   onChanged: (value) {
-                            //     setState(() {
-                            //       _selectedStatus = value!;
-                            //     });
-                            //   },
-                            // ),
-                            // const SizedBox(height: 16),
                             TextFormField(
                               controller: _locationController,
                               decoration: const InputDecoration(
@@ -252,13 +196,6 @@ class _AddReportState extends State<AddReport> {
                                 }
                                 return null;
                               },
-                            ),
-                            const SizedBox(height: 16),
-                            ElevatedButton(
-                              onPressed: _pickImage,
-                              child: Text(_file != null
-                                  ? 'เลือกไฟล์: ${_file!.name}'
-                                  : 'เลือกไฟล์'),
                             ),
                             const SizedBox(height: 16),
                             Row(

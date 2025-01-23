@@ -21,6 +21,7 @@ class _ProfileState extends State<Profile> {
   String? username;
   String? role;
   String? email;
+  String? userId; // ตัวแปรเก็บ ID ผู้ใช้ที่ล็อกอิน
   bool _obscureText = true;
 
   List<dynamic> users = [];
@@ -100,10 +101,12 @@ class _ProfileState extends State<Profile> {
   Future<void> _loadUserName() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
+      userId = prefs.getString('id'); // ดึง ID ผู้ใช้
       username = prefs.getString('name'); // ดึงค่าชื่อผู้ใช้
       role = prefs.getString('role'); // ดึงตำแหน่งผู้ใช้
       email = prefs.getString('email'); // ดึงอีเมลผู้ใช้
       roleController.text = role ?? ''; // กำหนดตำแหน่งให้ในฟอร์ม
+      nameController.text = username ?? ''; // กำหนดตำแหน่งให้ในฟอร์ม
     });
   }
 
@@ -263,26 +266,24 @@ class _ProfileState extends State<Profile> {
                                           child: Column(
                                             mainAxisSize: MainAxisSize.min,
                                             children: [
-                                              // ชื่อผู้ใช้งาน
-                                              TextFormField(
-                                                controller: nameController,
-                                                decoration:
-                                                    const InputDecoration(
-                                                  labelText: 'ชื่อ - นามสกุล',
-                                                  hintText: 'ใส่ชื่อ - นามสกุล',
-                                                  border:
-                                                      UnderlineInputBorder(),
-                                                ),
-                                                validator: (value) {
-                                                  if (value == null ||
-                                                      value.trim().isEmpty) {
-                                                    return 'กรุณาใส่ชื่อ - นามสกุล';
-                                                  }
-                                                  return null;
-                                                },
-                                              ),
+                                              // // ชื่อผู้ใช้งาน
+                                              // TextFormField(
+                                              //   controller: nameController,
+                                              //   decoration: const InputDecoration(
+                                              //     labelText: 'ชื่อ - นามสกุล',
+                                              //     hintText: 'ใส่ชื่อ - นามสกุล',
+                                              //     border: UnderlineInputBorder(),
+                                              //   ),
+                                              //   validator: (value) {
+                                              //     if (value == null ||
+                                              //         value.trim().isEmpty) {
+                                              //       return 'กรุณาใส่ชื่อ - นามสกุล';
+                                              //     }
+                                              //     return null;
+                                              //   },
+                                              // ),
 
-                                              const SizedBox(height: 8.0),
+                                              // const SizedBox(height: 8.0),
 
                                               // อีเมลผู้ใช้งาน
                                               TextFormField(
@@ -305,20 +306,17 @@ class _ProfileState extends State<Profile> {
 
                                               const SizedBox(height: 8.0),
 
-                                              // ตำแหน่งงานผู้ใช้งาน (ไม่สามารถเลือกได้)
-                                              TextFormField(
-                                                controller: roleController,
-                                                readOnly:
-                                                    true, // ปิดไม่ให้เลือก
-                                                decoration:
-                                                    const InputDecoration(
-                                                  labelText: 'ตำแหน่งงาน',
-                                                  border:
-                                                      UnderlineInputBorder(),
-                                                ),
-                                              ),
+                                              // // // ตำแหน่งงานผู้ใช้งาน (ไม่สามารถเลือกได้)
+                                              // TextFormField(
+                                              //   controller: roleController,
+                                              //   readOnly: true, // ปิดไม่ให้เลือก
+                                              //   decoration: const InputDecoration(
+                                              //     labelText: 'ตำแหน่งงาน',
+                                              //     border: UnderlineInputBorder(),
+                                              //   ),
+                                              // ),
 
-                                              const SizedBox(height: 8.0),
+                                              // const SizedBox(height: 8.0),
 
                                               // รหัสผ่านใหม่
                                               TextFormField(
@@ -358,9 +356,11 @@ class _ProfileState extends State<Profile> {
                                               if (formKey.currentState!
                                                   .validate()) {
                                                 // ส่งข้อมูลไปแก้ไข
-
-                                                editUser(users[0]['id']);
-                                                // Navigator.of(context).pop();
+                                                if (userId != null) {
+                                                  await editUser(userId!);
+                                                } else {
+                                                  print("User ID is null");
+                                                }
                                                 Navigator.of(context)
                                                     .pop(); // ปิด dialog ก่อน
                                                 SharedPreferences prefs =
@@ -378,6 +378,31 @@ class _ProfileState extends State<Profile> {
                                               }
                                             },
                                           ),
+
+                                          // TextButton(
+                                          //   child: const Text('บันทึก'),
+                                          //   onPressed: () async {
+                                          //     // ตรวจสอบว่าฟอร์มถูกต้องหรือไม่
+                                          //     if (formKey.currentState!.validate()) {
+                                          //       // ส่งข้อมูลไปแก้ไข
+                                          //       editUser(userId!);
+
+                                          //       // Navigator.of(context).pop();
+                                          //       Navigator.of(context)
+                                          //           .pop(); // ปิด dialog ก่อน
+                                          //       SharedPreferences prefs =
+                                          //           await SharedPreferences.getInstance();
+                                          //       await prefs
+                                          //           .clear(); // ลบข้อมูลทั้งหมด หรือใช้ prefs.remove('name') เพื่อลบเฉพาะค่า
+                                          //       Navigator.pushReplacement(
+                                          //         context,
+                                          //         MaterialPageRoute(
+                                          //           builder: (context) => const Login(),
+                                          //         ),
+                                          //       );
+                                          //     }
+                                          //   },
+                                          // ),
                                         ],
                                       );
                                     },
@@ -387,7 +412,7 @@ class _ProfileState extends State<Profile> {
                             },
                             backgroundColor: bottoncolor, // สีพื้นหลัง
                             child: const Icon(
-                              Icons.settings,
+                              Icons.settings, // ไอคอนเครื่องหมาย "+"
                               color: Colors.white,
                             ),
                             tooltip:

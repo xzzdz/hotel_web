@@ -330,6 +330,8 @@ class _DashbordState extends State<Dashbord> {
                   toY: entry.value.toDouble(),
                   color: Colors.primaries[index % Colors.primaries.length],
                   width: 24,
+                  borderRadius: BorderRadius.circular(3),
+                  // กำหนดให้เป็นเหลี่ยม
                 ),
               ],
             );

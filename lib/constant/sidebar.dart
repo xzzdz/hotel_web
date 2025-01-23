@@ -82,23 +82,7 @@ class Sidebar extends StatelessWidget {
               ),
             ),
           ),
-          // เงื่อนไขสำหรับการแสดงเมนูจัดการผู้ใช้งาน
-          if (role == "ผู้ดูแลระบบ") ...[
-            ListTile(
-              leading: const Icon(Icons.dashboard),
-              title: const Text("รายงานสรุป",
-                  style: TextStyle(fontFamily: Font_.Fonts_T)),
-              onTap: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const Dashbord(),
-                  ),
-                );
-              },
-            ),
-            const Divider(),
-          ],
+
           ListTile(
             leading: const Icon(Icons.list),
             title: const Text("รายการแจ้งซ่อม",
@@ -141,6 +125,23 @@ class Sidebar extends StatelessWidget {
             },
           ),
           const Divider(),
+          // เงื่อนไขสำหรับการแสดงเมนูจัดการผู้ใช้งาน
+          if (role == "ผู้ดูแลระบบ") ...[
+            ListTile(
+              leading: const Icon(Icons.dashboard),
+              title: const Text("รายงานสรุป",
+                  style: TextStyle(fontFamily: Font_.Fonts_T)),
+              onTap: () {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const Dashbord(),
+                  ),
+                );
+              },
+            ),
+            const Divider(),
+          ],
           // เงื่อนไขสำหรับการแสดงเมนูจัดการผู้ใช้งาน
           if (role == "ผู้ดูแลระบบ") ...[
             ListTile(
