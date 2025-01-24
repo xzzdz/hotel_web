@@ -18,6 +18,7 @@ class HomepageWeb extends StatefulWidget {
 class _HomepageWebState extends State<HomepageWeb> {
   String? username;
   String? role;
+  String searchText = ''; // ตัวแปรสำหรับคำค้นหา
 
   int currentPage = 0;
   String? selectedType = 'ทั้งหมด';
@@ -139,10 +140,32 @@ class _HomepageWebState extends State<HomepageWeb> {
                   }
 
                   final filteredData = snapshot.data!.where((item) {
-                    return (selectedType == 'ทั้งหมด' ||
-                            item['type'] == selectedType) &&
-                        (selectedStatus == 'ทั้งหมด' ||
-                            item['status'] == selectedStatus);
+                    final matchesType = selectedType == 'ทั้งหมด' ||
+                        item['type'] == selectedType;
+                    final matchesStatus = selectedStatus == 'ทั้งหมด' ||
+                        item['status'] == selectedStatus;
+                    final matchesSearch = searchText.isEmpty ||
+                        item['detail']
+                            .toString()
+                            .toLowerCase()
+                            .contains(searchText.toLowerCase()) ||
+                        item['location']
+                            .toString()
+                            .toLowerCase()
+                            .contains(searchText.toLowerCase()) ||
+                        item['date']
+                            .toString()
+                            .toLowerCase()
+                            .contains(searchText.toLowerCase()) ||
+                        item['type']
+                            .toString()
+                            .toLowerCase()
+                            .contains(searchText.toLowerCase()) ||
+                        item['status']
+                            .toString()
+                            .toLowerCase()
+                            .contains(searchText.toLowerCase());
+                    return matchesType && matchesStatus && matchesSearch;
                   }).toList();
 
                   int rowsPerPage = 5; // กำหนดจำนวนแถวต่อหน้า
@@ -222,6 +245,27 @@ class _HomepageWebState extends State<HomepageWeb> {
                             ),
 
                             const SizedBox(height: 16),
+                            TextField(
+                              decoration: InputDecoration(
+                                labelText: 'พิมพ์คำค้นหา',
+                                labelStyle:
+                                    const TextStyle(fontFamily: Font_.Fonts_T),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                suffixIcon: IconButton(
+                                  icon: const Icon(Icons.search),
+                                  onPressed: () {
+                                    setState(() {});
+                                  },
+                                ),
+                              ),
+                              onChanged: (value) {
+                                searchText = value;
+                                setState(() {});
+                              },
+                            ),
+                            const SizedBox(height: 20),
                             // Filters Section
                             Row(
                               children: [
@@ -246,6 +290,7 @@ class _HomepageWebState extends State<HomepageWeb> {
                               ],
                             ),
                             const SizedBox(height: 16),
+
                             // Data Table with Pagination
                             Expanded(
                               child: Column(
