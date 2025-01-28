@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -29,6 +32,8 @@ class _AddReportState extends State<AddReport> {
   List<String> types = ['ไฟฟ้า', 'ประปา', 'สวน', 'แอร์', 'อื่นๆ'];
   List<String> statuses = ['รอดำเนินการ'];
 
+  File? _image;
+
   Future<void> _loadUserName() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
@@ -36,6 +41,16 @@ class _AddReportState extends State<AddReport> {
       role = prefs.getString('role');
     });
     // print("Username: $username, Role: $role");
+  }
+
+  Future<void> _pickImage() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      setState(() {
+        _image = File(pickedFile.path);
+      });
+    }
   }
 
   Future<void> _submitReport() async {
