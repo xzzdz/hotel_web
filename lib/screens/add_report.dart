@@ -1,16 +1,15 @@
-import 'dart:io';
-
+import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
-
+import 'package:image_picker_web/image_picker_web.dart'; // Web image picker
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:http/http.dart' as http;
+import 'package:flutter/foundation.dart'; // For kIsWeb
 import '../constant/color_font.dart';
 import '../constant/sidebar.dart';
 import 'home.dart';
 import 'login.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
+import 'dart:html' as html;
+import 'dart:typed_data';
 
 class AddReport extends StatefulWidget {
   const AddReport({super.key});
@@ -32,7 +31,7 @@ class _AddReportState extends State<AddReport> {
   List<String> types = ['ไฟฟ้า', 'ประปา', 'สวน', 'แอร์', 'อื่นๆ'];
   List<String> statuses = ['รอดำเนินการ'];
 
-  File? _image;
+  dynamic _selectedImage; // Change to dynamic for web image handling
 
   Future<void> _loadUserName() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -40,15 +39,15 @@ class _AddReportState extends State<AddReport> {
       username = prefs.getString('name');
       role = prefs.getString('role');
     });
-    // print("Username: $username, Role: $role");
   }
 
+  // Web-compatible image picker
   Future<void> _pickImage() async {
-    final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-    if (pickedFile != null) {
+    var pickedImage =
+        await ImagePickerWeb.getImageAsBytes(); // Web version of image picker
+    if (pickedImage != null) {
       setState(() {
-        _image = File(pickedFile.path);
+        _selectedImage = pickedImage;
       });
     }
   }
@@ -58,26 +57,41 @@ class _AddReportState extends State<AddReport> {
       String url =
           "http://www.comdept.cmru.ac.th/64143168/hotel_app_php/add_report.php";
 
-      // สร้างข้อมูลสำหรับส่ง
-      Map<String, String> data = {
-        'username': username ?? '',
-        'date': _selectedDate.toIso8601String(),
-        'type': _selectedType,
-        'status': _selectedStatus,
-        'detail': _detailController.text,
-        'location': _locationController.text,
-      };
+      var request = http.MultipartRequest('POST', Uri.parse(url));
+      request.fields['username'] = username ?? '';
+      request.fields['date'] = _selectedDate.toIso8601String();
+      request.fields['type'] = _selectedType;
+      request.fields['status'] = _selectedStatus;
+      request.fields['detail'] = _detailController.text;
+      request.fields['location'] = _locationController.text;
+
+      print('username: $username');
+      print('type: $_selectedType');
+      print('status: $_selectedStatus');
+      print('detail: ${_detailController.text}');
+      print('location: ${_locationController.text}');
+
+      // For web (dart:io not available)
+      if (kIsWeb && _selectedImage != null) {
+        // ดึงนามสกุลไฟล์ (เช่น .jpg, .png เป็นต้น)
+        String extension = _getFileExtension(_selectedImage);
+
+        // สร้าง MultipartFile โดยใช้ชื่อไฟล์ที่ตั้งแบบไดนามิก
+        var imageFile = http.MultipartFile.fromBytes(
+          'image',
+          _selectedImage,
+          filename: 'img$extension', // ใช้ชื่อไฟล์ที่ได้จากนามสกุล
+        );
+        request.files.add(imageFile); // เพิ่มไฟล์ภาพ
+      }
 
       try {
-        // ส่งคำขอแบบ POST
-        final response = await http.post(
-          Uri.parse(url),
-          body: data,
-        );
+        var streamedResponse = await request.send();
+        var response = await http.Response.fromStream(streamedResponse);
 
-        // ตรวจสอบสถานะการตอบกลับ
         if (response.statusCode == 200) {
           var responseData = json.decode(response.body);
+          print(responseData);
 
           if (responseData['success']) {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -107,6 +121,22 @@ class _AddReportState extends State<AddReport> {
         );
       }
     }
+  }
+
+  // ฟังก์ชันในการดึงนามสกุลไฟล์ (เช่น .jpg, .png)
+  String _getFileExtension(Uint8List imageBytes) {
+    // หากคุณทราบประเภทของไฟล์ (เช่น jpeg หรือ png) คุณสามารถตรวจสอบจากไบต์แรกๆ ของไฟล์ได้
+    String extension = ".jpg"; // กำหนดเป็น .jpg ถ้าไม่ทราบ (สามารถขยายได้)
+    if (_selectedImage.isNotEmpty) {
+      var byteHeader = _selectedImage.sublist(0, 4);
+      if (byteHeader[0] == 0x89 && byteHeader[1] == 0x50) {
+        extension = '.png'; // PNG
+      } else if (byteHeader[0] == 0xFF && byteHeader[1] == 0xD8) {
+        extension = '.jpg'; // JPG
+      }
+      // คุณสามารถขยายตรรกะนี้ให้รองรับรูปแบบอื่นๆ ได้ตามต้องการ
+    }
+    return extension;
   }
 
   @override
@@ -213,22 +243,34 @@ class _AddReportState extends State<AddReport> {
                             Row(
                               children: [
                                 const Icon(
-                                  Icons.calendar_today, // เลือกไอคอนที่ต้องการ
+                                  Icons.calendar_today,
                                   color: Colors.black87,
                                   size: 20,
                                 ),
-                                const SizedBox(
-                                    width:
-                                        8), // เพิ่มช่องว่างระหว่างไอคอนกับข้อความ
+                                const SizedBox(width: 8),
                                 Text(
                                   "วันที่: ${_selectedDate.toLocal().toString().split(' ')[0]}",
                                   style: const TextStyle(
                                     fontFamily: Font_.Fonts_T,
-                                    // fontSize: 16,
                                     color: Colors.black87,
                                   ),
                                 ),
                               ],
+                            ),
+                            const SizedBox(height: 16),
+                            // Display the selected image file name
+                            if (_selectedImage != null)
+                              Text(
+                                "ชื่อไฟล์: ",
+                                style: const TextStyle(
+                                    fontSize: 16, color: Colors.black),
+                              ),
+
+                            // Select image button
+                            TextButton.icon(
+                              onPressed: _pickImage,
+                              icon: const Icon(Icons.image),
+                              label: const Text("เลือกภาพ"),
                             ),
                             const SizedBox(height: 16),
                             Center(

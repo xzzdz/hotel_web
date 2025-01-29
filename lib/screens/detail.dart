@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../constant/color_font.dart';
 import '../constant/sidebar.dart';
 import 'login.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class Detail extends StatefulWidget {
   final dynamic item;
@@ -23,6 +25,7 @@ class _DetailState extends State<Detail> {
   String? username;
   String? role;
   String? location; // เพิ่มตัวแปรสำหรับสถานที่
+  String? imageUrl; // เพิ่มตัวแปรเพื่อเก็บ URL ของรูปภาพ
 
   @override
   void initState() {
@@ -56,6 +59,12 @@ class _DetailState extends State<Detail> {
           assignedTo = data['report']['assigned_to'];
           username = data['report']['username']; // ดึงข้อมูล username
           location = data['report']['location']; // ดึงข้อมูล location
+          imageUrl = data['report']['image'] != null
+              ? "http://www.comdept.cmru.ac.th/64143168/hotel_app_php/${data['report']['image']}"
+              : null;
+
+          print('Response JSON: $data');
+          print('imageUrl: $imageUrl');
         });
       } else {
         _showSnackBar('เกิดข้อผิดพลาด: ${data['message']}');
@@ -155,6 +164,7 @@ class _DetailState extends State<Detail> {
                                 'รายละเอียด', widget.item['detail']),
                             _buildDetailItem('สถานะ', currentStatus ?? '-'),
                             _buildDetailItem('วันที่แจ้ง', widget.item['date']),
+                            _buildImage(), // แสดงภาพที่โหลดจาก URL
 
                             if (assignedTo != null && assignedTo!.isNotEmpty)
                               _buildDetailItem('ผู้รับงาน', assignedTo ?? '-'),
@@ -202,6 +212,34 @@ class _DetailState extends State<Detail> {
         ],
       ),
     );
+  } // 'https://upload.wikimedia.org/wikipedia/commons/4/43/Cute_dog.jpg',
+
+  Widget _buildImage() {
+    if (imageUrl != null && imageUrl!.isNotEmpty) {
+      return InkWell(
+        onTap: () async {
+          // เปิด URL เมื่อคลิกที่ลิงก์
+          if (await canLaunch(imageUrl!)) {
+            await launch(imageUrl!);
+          } else {
+            throw 'ไม่สามารถเปิด URL ได้: $imageUrl';
+          }
+        },
+        child: Container(
+          padding: EdgeInsets.all(8),
+          child: Text(
+            'คลิกที่นี่เพื่อดูรูปภาพ',
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.blue,
+              decoration: TextDecoration.underline,
+            ),
+          ),
+        ),
+      );
+    } else {
+      return Center(child: Text('ไม่มีภาพให้แสดง'));
+    }
   }
 
   Widget _buildActionButton(String label, String newStatus) {
