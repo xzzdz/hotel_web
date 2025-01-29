@@ -32,6 +32,7 @@ class _AddReportState extends State<AddReport> {
   List<String> statuses = ['รอดำเนินการ'];
 
   dynamic _selectedImage; // Change to dynamic for web image handling
+  String _imageFileName = '';
 
   Future<void> _loadUserName() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -48,6 +49,8 @@ class _AddReportState extends State<AddReport> {
     if (pickedImage != null) {
       setState(() {
         _selectedImage = pickedImage;
+        _imageFileName =
+            'img_${DateTime.now().millisecondsSinceEpoch}.jpg'; // Set a default name or you can extract it based on file metadata
       });
     }
   }
@@ -214,7 +217,7 @@ class _AddReportState extends State<AddReport> {
                             TextFormField(
                               controller: _locationController,
                               decoration: const InputDecoration(
-                                labelText: 'สถานที่',
+                                labelText: 'สถานที่ ',
                                 border: OutlineInputBorder(),
                               ),
                               validator: (value) {
@@ -223,6 +226,15 @@ class _AddReportState extends State<AddReport> {
                                 }
                                 return null;
                               },
+                            ),
+
+                            Text(
+                              '*หมายเหตุ ระบุให้ชัดเจน เช่น 201,401 หรือ บอกสถานที่ให้ชัดเจน',
+                              style: TextStyle(
+                                color: Colors.red,
+                                fontSize: 12,
+                                // fontFamily: Font_.Fonts_T
+                              ),
                             ),
                             const SizedBox(height: 16),
                             TextFormField(
@@ -261,7 +273,7 @@ class _AddReportState extends State<AddReport> {
                             // Display the selected image file name
                             if (_selectedImage != null)
                               Text(
-                                "ชื่อไฟล์: ",
+                                "ชื่อไฟล์: $_imageFileName", // Show the file name here",
                                 style: const TextStyle(
                                     fontSize: 16, color: Colors.black),
                               ),
