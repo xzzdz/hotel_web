@@ -164,11 +164,13 @@ class _DetailState extends State<Detail> {
                                 'รายละเอียด', widget.item['detail']),
                             _buildDetailItem('สถานะ', currentStatus ?? '-'),
                             _buildDetailItem('วันที่แจ้ง', widget.item['date']),
-                            _buildImage(), // แสดงภาพที่โหลดจาก URL
 
                             if (assignedTo != null && assignedTo!.isNotEmpty)
                               _buildDetailItem('ผู้รับงาน', assignedTo ?? '-'),
-                            const SizedBox(height: 20),
+                            const SizedBox(height: 16),
+
+                            if (imageUrl != null && imageUrl!.isNotEmpty)
+                              _buildImage(), // แสดงภาพที่โหลดจาก URL
                           ],
                         ),
                       ),
