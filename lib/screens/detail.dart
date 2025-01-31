@@ -23,6 +23,8 @@ class _DetailState extends State<Detail> {
   String? currentStatus;
   String? assignedTo;
   String? username;
+  String? report_user_tel;
+  String? assigned_to_tel;
   String? role;
   String? location; // เพิ่มตัวแปรสำหรับสถานที่
   String? imageUrl; // เพิ่มตัวแปรเพื่อเก็บ URL ของรูปภาพ
@@ -59,6 +61,8 @@ class _DetailState extends State<Detail> {
           assignedTo = data['report']['assigned_to'];
           username = data['report']['username']; // ดึงข้อมูล username
           location = data['report']['location']; // ดึงข้อมูล location
+          report_user_tel = data['report']['report_user_tel'];
+          assigned_to_tel = data['report']['assigned_to_tel'];
           imageUrl = data['report']['image'] != null
               ? "http://www.comdept.cmru.ac.th/64143168/hotel_app_php/${data['report']['image']}"
               : null;
@@ -99,7 +103,7 @@ class _DetailState extends State<Detail> {
             Expanded(
               flex: 2,
               child: Sidebar(
-                username: username,
+                username: currentUserName,
                 role: role,
                 bottonColor: bottoncolor,
                 onLogout: logout,
@@ -156,7 +160,10 @@ class _DetailState extends State<Detail> {
                           children: [
                             _buildDetailItem('รหัสแจ้งซ่อม', widget.item['id']),
                             _buildDetailItem(
-                                'ผู้แจ้ง', username ?? '-'), // ใช้ username
+                                'ผู้แจ้งซ่อม', username ?? '-'), // ใช้ username
+                            _buildDetailItem(
+                                'เบอร์โทรผู้แจ้งซ่อม', report_user_tel ?? '-'),
+
                             _buildDetailItem('ประเภท', widget.item['type']),
                             _buildDetailItem(
                                 'สถานที่', location ?? '-'), // แสดงสถานที่
@@ -166,7 +173,9 @@ class _DetailState extends State<Detail> {
                             _buildDetailItem('วันที่แจ้ง', widget.item['date']),
 
                             if (assignedTo != null && assignedTo!.isNotEmpty)
-                              _buildDetailItem('ผู้รับงาน', assignedTo ?? '-'),
+                              _buildDetailItem('ช่างซ่อม', assignedTo ?? '-'),
+                            _buildDetailItem(
+                                'เบอร์โทรช่างซ่อม', assigned_to_tel ?? '-'),
                             const SizedBox(height: 16),
 
                             if (imageUrl != null && imageUrl!.isNotEmpty)
@@ -214,7 +223,8 @@ class _DetailState extends State<Detail> {
         ],
       ),
     );
-  } // 'https://upload.wikimedia.org/wikipedia/commons/4/43/Cute_dog.jpg',
+  }
+  // 'https://upload.wikimedia.org/wikipedia/commons/4/43/Cute_dog.jpg',
 
   Widget _buildImage() {
     if (imageUrl != null && imageUrl!.isNotEmpty) {

@@ -110,20 +110,20 @@ class Sidebar extends StatelessWidget {
               );
             },
           ),
-          const Divider(),
-          ListTile(
-            leading: const Icon(Icons.border_color),
-            title: const Text("เพิ่มประเภทการแจ้งซ่อม",
-                style: TextStyle(fontFamily: Font_.Fonts_T)),
-            onTap: () {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const AddType(),
-                ),
-              );
-            },
-          ),
+          // const Divider(),
+          // ListTile(
+          //   leading: const Icon(Icons.border_color),
+          //   title: const Text("เพิ่มประเภทการแจ้งซ่อม",
+          //       style: TextStyle(fontFamily: Font_.Fonts_T)),
+          //   onTap: () {
+          //     Navigator.pushReplacement(
+          //       context,
+          //       MaterialPageRoute(
+          //         builder: (context) => const AddType(),
+          //       ),
+          //     );
+          //   },
+          // ),
           const Divider(),
           // เงื่อนไขสำหรับการแสดงเมนูจัดการผู้ใช้งาน
           if (role == "ผู้ดูแลระบบ") ...[

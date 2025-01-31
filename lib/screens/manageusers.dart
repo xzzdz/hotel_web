@@ -37,7 +37,9 @@ class _AddUsersState extends State<ManageUsers> {
   TextEditingController nameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
+  TextEditingController confirmPasswordController = TextEditingController();
   TextEditingController roleController = TextEditingController();
+  TextEditingController telController = TextEditingController();
 
   // Function to fetch users
   Future<void> fetchUsers() async {
@@ -70,6 +72,7 @@ class _AddUsersState extends State<ManageUsers> {
       'email': emailController.text,
       'password': passwordController.text,
       'role': roleController.text,
+      'tel': telController.text
     });
 
     var data = json.decode(response.body);
@@ -79,6 +82,7 @@ class _AddUsersState extends State<ManageUsers> {
       emailController.clear();
       passwordController.clear();
       roleController.clear();
+      telController.clear();
     } else {
       print("Failed to add user: ${data['message']}");
     }
@@ -123,6 +127,11 @@ class _AddUsersState extends State<ManageUsers> {
     // ตรวจสอบและเพิ่ม password หากมี
     if (passwordController.text.isNotEmpty) {
       body['password'] = passwordController.text.trim();
+    }
+
+    // ตรวจสอบและเพิ่ม tel หากมี
+    if (telController.text.isNotEmpty) {
+      body['tel'] = telController.text.trim();
     }
 
     // Debug: พิมพ์ข้อมูลที่กำลังจะส่ง
@@ -186,6 +195,8 @@ class _AddUsersState extends State<ManageUsers> {
             nameController: nameController,
             emailController: emailController,
             passwordController: passwordController,
+            confirmPasswordController: confirmPasswordController,
+            telController: telController,
             onSubmit: AddUsers,
           ),
         ),
@@ -270,7 +281,7 @@ class _AddUsersState extends State<ManageUsers> {
                             DataTable(
                               columns: const [
                                 DataColumn(
-                                    label: Text('ชื่อ',
+                                    label: Text('ชื่อ - นามสกุล',
                                         style: TextStyle(
                                             fontWeight: FontWeight.bold))),
                                 DataColumn(
@@ -279,6 +290,10 @@ class _AddUsersState extends State<ManageUsers> {
                                             fontWeight: FontWeight.bold))),
                                 DataColumn(
                                     label: Text('ตำแหน่ง',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold))),
+                                DataColumn(
+                                    label: Text('เบอร์โทรศัพท์',
                                         style: TextStyle(
                                             fontWeight: FontWeight.bold))),
                                 DataColumn(
@@ -296,6 +311,7 @@ class _AddUsersState extends State<ManageUsers> {
                                     DataCell(Text(user['name'] ?? 'No Name')),
                                     DataCell(Text(user['email'] ?? 'No Email')),
                                     DataCell(Text(user['role'] ?? 'No Role')),
+                                    DataCell(Text(user['tel'] ?? 'No Role')),
                                     DataCell(
                                       Row(
                                         mainAxisSize: MainAxisSize.min,
@@ -314,11 +330,18 @@ class _AddUsersState extends State<ManageUsers> {
                                                   user['role'];
                                               passwordController.text =
                                                   ""; // ตั้งค่าเริ่มต้นให้เป็นค่าว่าง
+                                              TextEditingController
+                                                  confirmPasswordController =
+                                                  TextEditingController(); // เพิ่ม controller สำหรับยืนยันรหัสผ่าน
+
                                               showDialog(
                                                 context: context,
                                                 builder: (context) {
                                                   bool dialogObscureText =
                                                       _obscureText; // ใช้ตัวแปรแยกใน dialog
+                                                  bool
+                                                      dialogConfirmObscureText =
+                                                      _obscureText; // ใช้สำหรับ confirm password
                                                   return StatefulBuilder(
                                                     builder: (context,
                                                         setDialogState) {
@@ -470,6 +493,114 @@ class _AddUsersState extends State<ManageUsers> {
                                                                     },
                                                                   ),
                                                                 ),
+                                                                validator:
+                                                                    (value) {
+                                                                  if (value ==
+                                                                          null ||
+                                                                      value
+                                                                          .trim()
+                                                                          .isEmpty) {
+                                                                    return null; // ไม่จำเป็นต้องกรอกเบอร์โทรศัพท์
+                                                                  }
+                                                                  if (value
+                                                                          .length <
+                                                                      6) {
+                                                                    return 'รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร';
+                                                                  }
+                                                                  return null;
+                                                                },
+                                                              ),
+
+                                                              const SizedBox(
+                                                                  height: 8.0),
+
+// ยืนยันรหัสผ่าน
+                                                              TextFormField(
+                                                                controller:
+                                                                    confirmPasswordController,
+                                                                obscureText:
+                                                                    dialogConfirmObscureText,
+                                                                decoration:
+                                                                    InputDecoration(
+                                                                  labelText:
+                                                                      'ยืนยันรหัสผ่านใหม่',
+                                                                  hintText:
+                                                                      'ใส่รหัสผ่านใหม่อีกครั้ง',
+                                                                  suffixIcon:
+                                                                      IconButton(
+                                                                    icon: Icon(
+                                                                      dialogConfirmObscureText
+                                                                          ? Icons
+                                                                              .visibility_off
+                                                                          : Icons
+                                                                              .visibility,
+                                                                    ),
+                                                                    onPressed:
+                                                                        () {
+                                                                      setDialogState(
+                                                                          () {
+                                                                        dialogConfirmObscureText =
+                                                                            !dialogConfirmObscureText;
+                                                                      });
+                                                                    },
+                                                                  ),
+                                                                ),
+                                                                validator:
+                                                                    (value) {
+                                                                  if (value ==
+                                                                          null ||
+                                                                      value
+                                                                          .trim()
+                                                                          .isEmpty) {
+                                                                    return null; // ไม่จำเป็นต้องกรอกเบอร์โทรศัพท์
+                                                                  }
+                                                                  if (value !=
+                                                                      passwordController
+                                                                          .text) {
+                                                                    return 'รหัสผ่านไม่ตรงกัน';
+                                                                  }
+                                                                  return null;
+                                                                },
+                                                              ),
+
+// เบอร์โทรศัพท์
+                                                              TextFormField(
+                                                                controller:
+                                                                    telController,
+                                                                decoration:
+                                                                    const InputDecoration(
+                                                                  labelText:
+                                                                      'เบอร์โทรศัพท์',
+                                                                  hintText:
+                                                                      'ใส่เบอร์โทรศัพท์',
+                                                                  border:
+                                                                      UnderlineInputBorder(),
+                                                                ),
+                                                                keyboardType:
+                                                                    TextInputType
+                                                                        .phone, // ตั้งค่าให้คีย์บอร์ดเป็นแบบเบอร์โทร
+                                                                validator:
+                                                                    (value) {
+                                                                  if (value ==
+                                                                          null ||
+                                                                      value
+                                                                          .trim()
+                                                                          .isEmpty) {
+                                                                    return null; // ไม่จำเป็นต้องกรอกเบอร์โทรศัพท์
+                                                                  }
+                                                                  // ตรวจสอบว่าเป็นเบอร์โทรศัพท์จริง (10 หลักและเริ่มต้นด้วย 0)
+                                                                  final RegExp
+                                                                      telRegex =
+                                                                      RegExp(
+                                                                          r'^0[0-9]{9}$');
+                                                                  if (!telRegex
+                                                                      .hasMatch(
+                                                                          value
+                                                                              .trim())) {
+                                                                    return 'กรุณาใส่เบอร์โทรศัพท์ที่ถูกต้อง (10 หลักและเริ่มต้นด้วย 0)';
+                                                                  }
+                                                                  return null;
+                                                                },
                                                               ),
                                                             ],
                                                           ),

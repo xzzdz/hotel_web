@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:hotel_web/constant/color_font.dart';
 
-// Form Key และ Controllers สามารถส่งมาจาก Parent Widget
 class AddUserForm extends StatefulWidget {
   final GlobalKey<FormState> formKey;
   final TextEditingController roleController;
   final TextEditingController nameController;
   final TextEditingController emailController;
   final TextEditingController passwordController;
+  final TextEditingController confirmPasswordController; // เพิ่ม Controller
+  final TextEditingController telController;
   final VoidCallback onSubmit;
 
   const AddUserForm({
@@ -17,6 +18,8 @@ class AddUserForm extends StatefulWidget {
     required this.nameController,
     required this.emailController,
     required this.passwordController,
+    required this.confirmPasswordController, // รับ Controller จาก Parent
+    required this.telController,
     required this.onSubmit,
   }) : super(key: key);
 
@@ -26,6 +29,7 @@ class AddUserForm extends StatefulWidget {
 
 class _AddUserFormState extends State<AddUserForm> {
   bool _obscureText = true;
+  bool _obscureTextConfirm = true; // สำหรับ Confirm Password
 
   @override
   Widget build(BuildContext context) {
@@ -122,6 +126,68 @@ class _AddUserFormState extends State<AddUserForm> {
             validator: (value) {
               if (value == null || value.isEmpty) {
                 return 'กรุณากรอกรหัสผ่าน';
+              }
+              if (value.length < 6) {
+                return 'รหัสผ่านต้องมีความยาวอย่างน้อย 6 ตัวอักษร';
+              }
+              return null;
+            },
+          ),
+          const SizedBox(height: 16.0),
+
+// Confirm Password Field
+          TextFormField(
+            controller: widget.confirmPasswordController,
+            obscureText: _obscureTextConfirm,
+            decoration: InputDecoration(
+              labelText: 'ยืนยันรหัสผ่าน',
+              border: const OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(10.0)),
+              ),
+              suffixIcon: IconButton(
+                icon: Icon(
+                  _obscureTextConfirm ? Icons.visibility_off : Icons.visibility,
+                ),
+                onPressed: () {
+                  setState(() {
+                    _obscureTextConfirm = !_obscureTextConfirm;
+                  });
+                },
+              ),
+            ),
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'กรุณากรอกยืนยันรหัสผ่าน';
+              }
+              if (value.length < 6) {
+                return 'รหัสผ่านต้องมีความยาวอย่างน้อย 6 ตัวอักษร';
+              }
+              if (value != widget.passwordController.text) {
+                return 'รหัสผ่านไม่ตรงกัน';
+              }
+              return null;
+            },
+          ),
+          const SizedBox(height: 16.0),
+
+          // Tel Field
+          TextFormField(
+            controller: widget.telController,
+            keyboardType: TextInputType.phone,
+            decoration: const InputDecoration(
+              labelText: 'เบอร์โทรศัพท์',
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(10.0)),
+              ),
+            ),
+            validator: (value) {
+              if (value == null || value.trim().isEmpty) {
+                return 'กรุณากรอกเบอร์โทรศัพท์';
+              }
+              // ตรวจสอบว่าเบอร์โทรศัพท์ต้องมีเฉพาะตัวเลขและมี 10 หลัก
+              final regExp = RegExp(r'^0\d{9}$');
+              if (!regExp.hasMatch(value)) {
+                return 'กรุณากรอกเบอร์โทรศัพท์ให้ถูกต้อง';
               }
               return null;
             },

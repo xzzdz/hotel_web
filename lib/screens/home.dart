@@ -28,7 +28,8 @@ class _HomepageWebState extends State<HomepageWeb> {
     'ทั้งหมด',
     'รอดำเนินการ',
     'กำลังดำเนินการ',
-    'เสร็จสิ้น'
+    'เสร็จสิ้น',
+    'ส่งซ่อมภายนอก'
   ];
   bool isLoading = true;
   List<dynamic> reports = [];
@@ -164,6 +165,14 @@ class _HomepageWebState extends State<HomepageWeb> {
                         item['status']
                             .toString()
                             .toLowerCase()
+                            .contains(searchText.toLowerCase()) ||
+                        item['username']
+                            .toString()
+                            .toLowerCase()
+                            .contains(searchText.toLowerCase()) ||
+                        item['assigned_to']
+                            .toString()
+                            .toLowerCase()
                             .contains(searchText.toLowerCase());
                     return matchesType && matchesStatus && matchesSearch;
                   }).toList();
@@ -226,6 +235,15 @@ class _HomepageWebState extends State<HomepageWeb> {
                                           .length,
                                       color: Colors.green,
                                       icon: Icons.check_circle,
+                                    ),
+                                    _buildDashboardItemWithStyle(
+                                      title: "ส่งซ่อมภายนอก",
+                                      count: filteredData
+                                          .where((item) =>
+                                              item['status'] == 'ส่งซ่อมภายนอก')
+                                          .length,
+                                      color: Colors.red,
+                                      icon: Icons.hardware,
                                     ),
                                     _buildDashboardItemWithStyle(
                                       title: "ทั้งหมด",
@@ -317,6 +335,14 @@ class _HomepageWebState extends State<HomepageWeb> {
                                                             FontWeight.bold),
                                                   ),
                                                 ),
+                                                // DataColumn(
+                                                //   label: Text(
+                                                //     "ประเภท",
+                                                //     style: TextStyle(
+                                                //         fontWeight:
+                                                //             FontWeight.bold),
+                                                //   ),
+                                                // ),
                                                 DataColumn(
                                                   label: Text(
                                                     "ประเภท",
@@ -327,7 +353,7 @@ class _HomepageWebState extends State<HomepageWeb> {
                                                 ),
                                                 DataColumn(
                                                   label: Text(
-                                                    "สถานะ",
+                                                    "สถานที่",
                                                     style: TextStyle(
                                                         fontWeight:
                                                             FontWeight.bold),
@@ -336,6 +362,14 @@ class _HomepageWebState extends State<HomepageWeb> {
                                                 DataColumn(
                                                   label: Text(
                                                     "รายละเอียด",
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold),
+                                                  ),
+                                                ),
+                                                DataColumn(
+                                                  label: Text(
+                                                    "สถานะ",
                                                     style: TextStyle(
                                                         fontWeight:
                                                             FontWeight.bold),
@@ -377,25 +411,15 @@ class _HomepageWebState extends State<HomepageWeb> {
                                                     statusColor = Colors.green;
                                                     break;
                                                   default:
-                                                    statusColor = Colors.grey;
+                                                    statusColor = Colors.red;
                                                 }
 
                                                 return DataRow(cells: [
                                                   DataCell(Text(item['date'])),
                                                   DataCell(Text(item['type'])),
-                                                  DataCell(Row(
-                                                    children: [
-                                                      const SizedBox(width: 8),
-                                                      Text(
-                                                        item['status'],
-                                                        style: TextStyle(
-                                                          color: statusColor,
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                        ), // สีของข้อความสถานะ
-                                                      ),
-                                                    ],
-                                                  )),
+
+                                                  DataCell(
+                                                      Text(item['location'])),
                                                   DataCell(
                                                     SizedBox(
                                                       width:
@@ -415,6 +439,19 @@ class _HomepageWebState extends State<HomepageWeb> {
                                                       ),
                                                     ),
                                                   ),
+                                                  DataCell(Row(
+                                                    children: [
+                                                      // const SizedBox(width: 8),
+                                                      Text(
+                                                        item['status'],
+                                                        style: TextStyle(
+                                                          color: statusColor,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                        ), // สีของข้อความสถานะ
+                                                      ),
+                                                    ],
+                                                  )),
                                                   DataCell(
                                                     IconButton(
                                                       color: bottoncolor,
@@ -435,66 +472,131 @@ class _HomepageWebState extends State<HomepageWeb> {
                                                     ),
                                                   ),
                                                   // การลบข้อมูล/////////////////
-                                                  DataCell(
-                                                    IconButton(
-                                                      color: Colors.red,
-                                                      icon: const Icon(
-                                                          Icons.delete),
-                                                      onPressed: () async {
-                                                        // แสดงกล่องยืนยันการลบ
-                                                        bool isConfirmed =
-                                                            await showDialog(
-                                                          context: context,
-                                                          builder: (BuildContext
-                                                              context) {
-                                                            return AlertDialog(
-                                                              title: Text(
-                                                                  'ยืนยันการลบ'),
-                                                              content: Text(
-                                                                  'คุณแน่ใจว่าต้องการลบรายการนี้?'),
-                                                              actions: <Widget>[
-                                                                TextButton(
-                                                                  onPressed:
-                                                                      () {
-                                                                    Navigator.of(
-                                                                            context)
-                                                                        .pop(
-                                                                            false); // ผู้ใช้กด "ยกเลิก"
-                                                                  },
-                                                                  child: Text(
-                                                                      'ยกเลิก'),
-                                                                ),
-                                                                TextButton(
-                                                                  onPressed:
-                                                                      () {
-                                                                    Navigator.of(
-                                                                            context)
-                                                                        .pop(
-                                                                            true); // ผู้ใช้กด "ยืนยัน"
-                                                                  },
-                                                                  child: Text(
-                                                                      'ยืนยัน'),
-                                                                ),
-                                                              ],
-                                                            );
-                                                          },
-                                                        );
+                                                  // DataCell(
+                                                  //   IconButton(
+                                                  //     color: Colors.red,
+                                                  //     icon: const Icon(
+                                                  //         Icons.delete),
+                                                  //     onPressed: () async {
+                                                  //       // แสดงกล่องยืนยันการลบ
+                                                  //       bool isConfirmed =
+                                                  //           await showDialog(
+                                                  //         context: context,
+                                                  //         builder: (BuildContext
+                                                  //             context) {
+                                                  //           return AlertDialog(
+                                                  //             title: Text(
+                                                  //                 'ยืนยันการลบ'),
+                                                  //             content: Text(
+                                                  //                 'คุณแน่ใจว่าต้องการลบรายการนี้?'),
+                                                  //             actions: <Widget>[
+                                                  //               TextButton(
+                                                  //                 onPressed:
+                                                  //                     () {
+                                                  //                   Navigator.of(
+                                                  //                           context)
+                                                  //                       .pop(
+                                                  //                           false); // ผู้ใช้กด "ยกเลิก"
+                                                  //                 },
+                                                  //                 child: Text(
+                                                  //                     'ยกเลิก'),
+                                                  //               ),
+                                                  //               TextButton(
+                                                  //                 onPressed:
+                                                  //                     () {
+                                                  //                   Navigator.of(
+                                                  //                           context)
+                                                  //                       .pop(
+                                                  //                           true); // ผู้ใช้กด "ยืนยัน"
+                                                  //                 },
+                                                  //                 child: Text(
+                                                  //                     'ยืนยัน'),
+                                                  //               ),
+                                                  //             ],
+                                                  //           );
+                                                  //         },
+                                                  //       );
 
-                                                        // ถ้าผู้ใช้ยืนยันการลบ
-                                                        if (isConfirmed) {
-                                                          bool isSuccess =
-                                                              await deleteReport(
-                                                                  item['id']);
-                                                          if (isSuccess) {
-                                                            // รีเฟรชข้อมูลหลังจากลบ
-                                                            setState(() {
-                                                              filteredData
-                                                                  .remove(item);
-                                                            });
-                                                          }
-                                                        }
-                                                      },
-                                                    ),
+                                                  //       // ถ้าผู้ใช้ยืนยันการลบ
+                                                  //       if (isConfirmed) {
+                                                  //         bool isSuccess =
+                                                  //             await deleteReport(
+                                                  //                 item['id']);
+                                                  //         if (isSuccess) {
+                                                  //           // รีเฟรชข้อมูลหลังจากลบ
+                                                  //           setState(() {
+                                                  //             filteredData
+                                                  //                 .remove(item);
+                                                  //           });
+                                                  //         }
+                                                  //       }
+                                                  //     },
+                                                  //   ),
+                                                  // ),
+                                                  DataCell(
+                                                    // ตรวจสอบ username ก่อนแสดงไอคอน
+                                                    username == item['username']
+                                                        ? IconButton(
+                                                            color: Colors.red,
+                                                            icon: const Icon(
+                                                                Icons.delete),
+                                                            onPressed:
+                                                                () async {
+                                                              // แสดงกล่องยืนยันการลบ
+                                                              bool isConfirmed =
+                                                                  await showDialog(
+                                                                context:
+                                                                    context,
+                                                                builder:
+                                                                    (BuildContext
+                                                                        context) {
+                                                                  return AlertDialog(
+                                                                    title: Text(
+                                                                        'ยืนยันการลบ'),
+                                                                    content: Text(
+                                                                        'คุณแน่ใจว่าต้องการลบรายการนี้?'),
+                                                                    actions: <Widget>[
+                                                                      TextButton(
+                                                                        onPressed:
+                                                                            () {
+                                                                          Navigator.of(context)
+                                                                              .pop(false); // ผู้ใช้กด "ยกเลิก"
+                                                                        },
+                                                                        child: Text(
+                                                                            'ยกเลิก'),
+                                                                      ),
+                                                                      TextButton(
+                                                                        onPressed:
+                                                                            () {
+                                                                          Navigator.of(context)
+                                                                              .pop(true); // ผู้ใช้กด "ยืนยัน"
+                                                                        },
+                                                                        child: Text(
+                                                                            'ยืนยัน'),
+                                                                      ),
+                                                                    ],
+                                                                  );
+                                                                },
+                                                              );
+
+                                                              // ถ้าผู้ใช้ยืนยันการลบ
+                                                              if (isConfirmed) {
+                                                                bool isSuccess =
+                                                                    await deleteReport(
+                                                                        item[
+                                                                            'id']);
+                                                                if (isSuccess) {
+                                                                  // รีเฟรชข้อมูลหลังจากลบ
+                                                                  setState(() {
+                                                                    filteredData
+                                                                        .remove(
+                                                                            item);
+                                                                  });
+                                                                }
+                                                              }
+                                                            },
+                                                          )
+                                                        : const SizedBox(), // ไม่แสดงอะไรหาก username ไม่ตรงกัน
                                                   ),
                                                 ]);
                                               }).toList(),

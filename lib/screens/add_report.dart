@@ -25,11 +25,11 @@ class _AddReportState extends State<AddReport> {
   final TextEditingController _detailController = TextEditingController();
   final TextEditingController _locationController = TextEditingController();
   String _selectedType = 'ไฟฟ้า';
-  String _selectedStatus = 'รอดำเนินการ';
+  String _selectedStatus = 'รอดำเนินการ'; //รอดำเนินการ
   DateTime _selectedDate = DateTime.now();
 
   List<String> types = ['ไฟฟ้า', 'ประปา', 'สวน', 'แอร์', 'อื่นๆ'];
-  List<String> statuses = ['รอดำเนินการ'];
+  List<String> statuses = ['รอดำเนินการ']; //รอดำเนินการ
 
   dynamic _selectedImage; // Change to dynamic for web image handling
   String _imageFileName = '';
