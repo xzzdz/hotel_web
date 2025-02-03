@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hotel_web/splash_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'screens/home.dart';
@@ -30,7 +31,7 @@ class MyApp extends StatelessWidget {
         ),
       ),
       // ตรวจสอบสถานะ: ถ้าล็อกอินแล้วไป Homepage ถ้ายังให้ไป Login
-      home: isLoggedIn ? const HomepageWeb() : const Login(),
+      home: isLoggedIn ? const HomepageWeb() : const SplashScreen(),
     );
   }
 }

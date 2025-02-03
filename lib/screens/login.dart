@@ -146,9 +146,9 @@ class _LoginState extends State<Login> {
                                   'assets/img/111.png',
                                   width: 300,
                                 ),
-                                const SizedBox(height: 10),
+                                // const SizedBox(height: 10),
                                 Text(
-                                  'แอปพลิเคชันระบบแจ้งซ่อม',
+                                  'ระบบแจ้งซ่อม',
                                   style: TextStyle(
                                     fontSize: 16,
                                     color: Colors.grey,
