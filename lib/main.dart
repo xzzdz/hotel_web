@@ -23,7 +23,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'The Kannas Repair App',
+      title: 'ระบบแจ้งซ่อม โรงแรมเดอะแคนนาส เชียงใหม่',
       theme: ThemeData(
         primarySwatch: Colors.grey,
         scrollbarTheme: ScrollbarThemeData(
