@@ -205,7 +205,7 @@ class _DashbordState extends State<Dashbord> {
                                   _buildSectionTitle(
                                       "จำนวนการแจ้งซ่อมแต่ละเดือน"),
                                   const SizedBox(height: 16),
-                                  _buildBarChart(processDataByMonth(reports)),
+                                  _buildBarChartm(processDataByMonth(reports)),
                                   const SizedBox(height: 20),
                                   Row(
                                     mainAxisAlignment:
@@ -226,7 +226,7 @@ class _DashbordState extends State<Dashbord> {
                                               ),
                                             ),
                                             const SizedBox(height: 16),
-                                            _buildBarChart(typeData),
+                                            _buildBarChartt(typeData),
                                           ],
                                         ),
                                       ),
@@ -311,7 +311,7 @@ class _DashbordState extends State<Dashbord> {
     );
   }
 
-  Widget _buildBarChart(Map<String, int> data) {
+  Widget _buildBarChartm(Map<String, int> data) {
     final maxValue = data.values.isNotEmpty
         ? data.values.reduce((a, b) => a > b ? a : b)
         : 0;
@@ -373,38 +373,147 @@ class _DashbordState extends State<Dashbord> {
             ),
           ),
           gridData: FlGridData(show: true),
+          barTouchData: BarTouchData(
+            enabled: true,
+            touchTooltipData: BarTouchTooltipData(
+              tooltipPadding:
+                  const EdgeInsets.only(top: 6, bottom: 6, left: 16, right: 16),
+              tooltipMargin: 8,
+              fitInsideHorizontally: true,
+              fitInsideVertically: true,
+              getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                return BarTooltipItem(
+                  rod.toY.toInt().toString(),
+                  const TextStyle(color: Colors.white, fontSize: 14),
+                );
+              },
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBarChartt(Map<String, int> data) {
+    final maxValue = data.values.isNotEmpty
+        ? data.values.reduce((a, b) => a > b ? a : b)
+        : 0;
+    final interval = (maxValue / 5).ceil(); // คำนวณช่วงระยะห่างจากค่ามากสุด
+
+    final List<String> fixedOrder = ['ไฟฟ้า', 'ประปา', 'สวน', 'แอร์', 'อื่นๆ'];
+
+    final Map<String, Color> fixedColors = {
+      'ไฟฟ้า': Colors.orange,
+      'ประปา': Colors.lightBlue,
+      'สวน': Colors.green,
+      'แอร์': Colors.red,
+      'อื่นๆ': Colors.purple,
+    };
+
+    return SizedBox(
+      height: 300,
+      child: BarChart(
+        BarChartData(
+          barGroups: fixedOrder.asMap().entries.map((entry) {
+            final index = entry.key;
+            final key = entry.value;
+            return BarChartGroupData(
+              x: index,
+              barRods: [
+                BarChartRodData(
+                  toY: data[key]?.toDouble() ?? 0,
+                  color: fixedColors[key] ?? Colors.grey,
+                  width: 24,
+                  borderRadius: BorderRadius.circular(3),
+                  rodStackItems: [],
+                  borderSide: BorderSide.none,
+                  backDrawRodData: BackgroundBarChartRodData(show: false),
+                ),
+              ],
+            );
+          }).toList(),
+          titlesData: FlTitlesData(
+            leftTitles: AxisTitles(
+              sideTitles: SideTitles(
+                showTitles: true,
+                interval: interval.toDouble(),
+                getTitlesWidget: (value, meta) {
+                  return Text(
+                    value.toInt().toString(),
+                    style: const TextStyle(fontSize: 14),
+                  );
+                },
+              ),
+            ),
+            bottomTitles: AxisTitles(
+              sideTitles: SideTitles(
+                showTitles: true,
+                getTitlesWidget: (value, meta) {
+                  if (value.toInt() < 0 || value.toInt() >= fixedOrder.length) {
+                    return const Text('');
+                  }
+                  return Text(
+                    fixedOrder[value.toInt()],
+                    style: const TextStyle(fontSize: 16),
+                  );
+                },
+              ),
+            ),
+            topTitles: AxisTitles(
+              sideTitles: SideTitles(showTitles: false),
+            ),
+            rightTitles: AxisTitles(
+              sideTitles: SideTitles(showTitles: false),
+            ),
+          ),
+          gridData: FlGridData(show: true),
+          barTouchData: BarTouchData(
+            enabled: true,
+            touchTooltipData: BarTouchTooltipData(
+              tooltipPadding:
+                  const EdgeInsets.only(top: 6, bottom: 6, left: 16, right: 16),
+              tooltipMargin: 8,
+              fitInsideHorizontally: true,
+              fitInsideVertically: true,
+              getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                return BarTooltipItem(
+                  rod.toY.toInt().toString(),
+                  const TextStyle(color: Colors.white, fontSize: 14),
+                );
+              },
+            ),
+          ),
         ),
       ),
     );
   }
 
   Widget _buildPieChart(Map<String, int> data) {
+    final List<String> fixedOrder = [
+      'รอดำเนินการ',
+      'กำลังดำเนินการ',
+      'เสร็จสิ้น',
+      'ส่งซ่อมภายนอก'
+    ];
+
+    Map<String, Color> sectionColors = {
+      'รอดำเนินการ': Colors.orange[300]!,
+      'กำลังดำเนินการ': Colors.blue[300]!,
+      'เสร็จสิ้น': Colors.green[300]!,
+      'ส่งซ่อมภายนอก': Colors.red[300]!,
+    };
+
     return Column(
       children: [
         SizedBox(
           height: 300,
           child: PieChart(
             PieChartData(
-              sections: data.entries.map((entry) {
-                Color sectionColor;
-                switch (entry.key) {
-                  case 'รอดำเนินการ':
-                    sectionColor = Colors.orange[300]!;
-                    break;
-                  case 'กำลังดำเนินการ':
-                    sectionColor = Colors.blue[300]!;
-                    break;
-                  case 'เสร็จสิ้น':
-                    sectionColor = Colors.green[300]!;
-                    break;
-                  default:
-                    sectionColor = Colors.grey[300]!;
-                }
-
+              sections: fixedOrder.map((key) {
                 return PieChartSectionData(
                   title: '',
-                  value: entry.value.toDouble(),
-                  color: sectionColor,
+                  value: data[key]?.toDouble() ?? 0,
+                  color: sectionColors[key] ?? Colors.grey,
                   radius: 150,
                 );
               }).toList(),
@@ -417,22 +526,7 @@ class _DashbordState extends State<Dashbord> {
         Wrap(
           spacing: 8.0,
           runSpacing: 4.0,
-          children: data.entries.map((entry) {
-            Color sectionColor;
-            switch (entry.key) {
-              case 'รอดำเนินการ':
-                sectionColor = Colors.orange;
-                break;
-              case 'กำลังดำเนินการ':
-                sectionColor = Colors.blue;
-                break;
-              case 'เสร็จสิ้น':
-                sectionColor = Colors.green;
-                break;
-              default:
-                sectionColor = Colors.grey;
-            }
-
+          children: fixedOrder.map((key) {
             return Row(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -440,13 +534,13 @@ class _DashbordState extends State<Dashbord> {
                   width: 16,
                   height: 16,
                   decoration: BoxDecoration(
-                    color: sectionColor,
+                    color: sectionColors[key] ?? Colors.grey,
                     shape: BoxShape.rectangle,
                   ),
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  "${entry.key} ${entry.value}",
+                  "$key ${data[key] ?? 0}",
                   style: const TextStyle(fontSize: 16),
                 ),
               ],

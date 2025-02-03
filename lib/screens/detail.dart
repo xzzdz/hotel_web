@@ -174,8 +174,10 @@ class _DetailState extends State<Detail> {
 
                             if (assignedTo != null && assignedTo!.isNotEmpty)
                               _buildDetailItem('ช่างซ่อม', assignedTo ?? '-'),
-                            _buildDetailItem(
-                                'เบอร์โทรช่างซ่อม', assigned_to_tel ?? '-'),
+
+                            if (assignedTo != null && assignedTo!.isNotEmpty)
+                              _buildDetailItem(
+                                  'เบอร์โทรช่างซ่อม', assigned_to_tel ?? '-'),
                             const SizedBox(height: 16),
 
                             if (imageUrl != null && imageUrl!.isNotEmpty)
@@ -225,6 +227,7 @@ class _DetailState extends State<Detail> {
     );
   }
   // 'https://upload.wikimedia.org/wikipedia/commons/4/43/Cute_dog.jpg',
+  // http://www.comdept.cmru.ac.th/64143168/hotel_app_php/uploads/679b234aa937e_img.jpg
 
   Widget _buildImage() {
     if (imageUrl != null && imageUrl!.isNotEmpty) {

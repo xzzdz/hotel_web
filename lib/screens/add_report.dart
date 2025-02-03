@@ -42,17 +42,24 @@ class _AddReportState extends State<AddReport> {
     });
   }
 
-  // Web-compatible image picker
   Future<void> _pickImage() async {
-    var pickedImage =
-        await ImagePickerWeb.getImageAsBytes(); // Web version of image picker
-    if (pickedImage != null) {
-      setState(() {
-        _selectedImage = pickedImage;
-        _imageFileName =
-            'img_${DateTime.now().millisecondsSinceEpoch}.jpg'; // Set a default name or you can extract it based on file metadata
-      });
-    }
+    final uploadInput = html.FileUploadInputElement();
+    uploadInput.accept = 'image/*';
+    uploadInput.click();
+
+    uploadInput.onChange.listen((e) {
+      final file = uploadInput.files?.first;
+      if (file != null) {
+        final reader = html.FileReader();
+        reader.readAsArrayBuffer(file);
+        reader.onLoadEnd.listen((event) {
+          setState(() {
+            _selectedImage = reader.result as Uint8List;
+            _imageFileName = file.name; // ใช้ชื่อไฟล์จริงที่เลือก
+          });
+        });
+      }
+    });
   }
 
   Future<void> _submitReport() async {
