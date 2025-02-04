@@ -41,6 +41,7 @@ class _HomepageWebState extends State<HomepageWeb> {
 
     if (response.statusCode == 200) {
       return json.decode(utf8.decode(response.bodyBytes));
+      // print(response.body);
     } else {
       throw Exception("เกิดข้อผิดพลาดในการเชื่อมต่อกับเซิร์ฟเวอร์");
     }
@@ -471,71 +472,77 @@ class _HomepageWebState extends State<HomepageWeb> {
                                                       },
                                                     ),
                                                   ),
-                                                  // การลบข้อมูล/////////////////
-                                                  // DataCell(
-                                                  //   IconButton(
-                                                  //     color: Colors.red,
-                                                  //     icon: const Icon(
-                                                  //         Icons.delete),
-                                                  //     onPressed: () async {
-                                                  //       // แสดงกล่องยืนยันการลบ
-                                                  //       bool isConfirmed =
-                                                  //           await showDialog(
-                                                  //         context: context,
-                                                  //         builder: (BuildContext
-                                                  //             context) {
-                                                  //           return AlertDialog(
-                                                  //             title: Text(
-                                                  //                 'ยืนยันการลบ'),
-                                                  //             content: Text(
-                                                  //                 'คุณแน่ใจว่าต้องการลบรายการนี้?'),
-                                                  //             actions: <Widget>[
-                                                  //               TextButton(
-                                                  //                 onPressed:
-                                                  //                     () {
-                                                  //                   Navigator.of(
-                                                  //                           context)
-                                                  //                       .pop(
-                                                  //                           false); // ผู้ใช้กด "ยกเลิก"
-                                                  //                 },
-                                                  //                 child: Text(
-                                                  //                     'ยกเลิก'),
-                                                  //               ),
-                                                  //               TextButton(
-                                                  //                 onPressed:
-                                                  //                     () {
-                                                  //                   Navigator.of(
-                                                  //                           context)
-                                                  //                       .pop(
-                                                  //                           true); // ผู้ใช้กด "ยืนยัน"
-                                                  //                 },
-                                                  //                 child: Text(
-                                                  //                     'ยืนยัน'),
-                                                  //               ),
-                                                  //             ],
-                                                  //           );
-                                                  //         },
-                                                  //       );
 
-                                                  //       // ถ้าผู้ใช้ยืนยันการลบ
-                                                  //       if (isConfirmed) {
-                                                  //         bool isSuccess =
-                                                  //             await deleteReport(
-                                                  //                 item['id']);
-                                                  //         if (isSuccess) {
-                                                  //           // รีเฟรชข้อมูลหลังจากลบ
-                                                  //           setState(() {
-                                                  //             filteredData
-                                                  //                 .remove(item);
-                                                  //           });
-                                                  //         }
-                                                  //       }
-                                                  //     },
-                                                  //   ),
+                                                  // DataCell(
+                                                  //   // ตรวจสอบ username ก่อนแสดงไอคอน
+                                                  //   username == item['username']
+                                                  //       ? IconButton(
+                                                  //           color: Colors.red,
+                                                  //           icon: const Icon(
+                                                  //               Icons.delete),
+                                                  //           onPressed:
+                                                  //               () async {
+                                                  //             // แสดงกล่องยืนยันการลบ
+                                                  //             bool isConfirmed =
+                                                  //                 await showDialog(
+                                                  //               context:
+                                                  //                   context,
+                                                  //               builder:
+                                                  //                   (BuildContext
+                                                  //                       context) {
+                                                  //                 return AlertDialog(
+                                                  //                   title: Text(
+                                                  //                       'ยืนยันการลบ'),
+                                                  //                   content: Text(
+                                                  //                       'คุณแน่ใจว่าต้องการลบรายการนี้?'),
+                                                  //                   actions: <Widget>[
+                                                  //                     TextButton(
+                                                  //                       onPressed:
+                                                  //                           () {
+                                                  //                         Navigator.of(context)
+                                                  //                             .pop(false); // ผู้ใช้กด "ยกเลิก"
+                                                  //                       },
+                                                  //                       child: Text(
+                                                  //                           'ยกเลิก'),
+                                                  //                     ),
+                                                  //                     TextButton(
+                                                  //                       onPressed:
+                                                  //                           () {
+                                                  //                         Navigator.of(context)
+                                                  //                             .pop(true); // ผู้ใช้กด "ยืนยัน"
+                                                  //                       },
+                                                  //                       child: Text(
+                                                  //                           'ยืนยัน'),
+                                                  //                     ),
+                                                  //                   ],
+                                                  //                 );
+                                                  //               },
+                                                  //             );
+
+                                                  //             // ถ้าผู้ใช้ยืนยันการลบ
+                                                  //             if (isConfirmed) {
+                                                  //               bool isSuccess =
+                                                  //                   await deleteReport(
+                                                  //                       item[
+                                                  //                           'id']);
+                                                  //               if (isSuccess) {
+                                                  //                 // รีเฟรชข้อมูลหลังจากลบ
+                                                  //                 setState(() {
+                                                  //                   filteredData
+                                                  //                       .remove(
+                                                  //                           item);
+                                                  //                 });
+                                                  //               }
+                                                  //             }
+                                                  //           },
+                                                  //         )
+                                                  //       : const SizedBox(), // ไม่แสดงอะไรหาก username ไม่ตรงกัน
                                                   // ),
                                                   DataCell(
-                                                    // ตรวจสอบ username ก่อนแสดงไอคอน
-                                                    username == item['username']
+                                                    // ตรวจสอบ role และ username ก่อนแสดงไอคอน
+                                                    role == 'ผู้ดูแลระบบ' ||
+                                                            username ==
+                                                                item['username']
                                                         ? IconButton(
                                                             color: Colors.red,
                                                             icon: const Icon(
@@ -551,10 +558,11 @@ class _HomepageWebState extends State<HomepageWeb> {
                                                                     (BuildContext
                                                                         context) {
                                                                   return AlertDialog(
-                                                                    title: Text(
+                                                                    title: const Text(
                                                                         'ยืนยันการลบ'),
-                                                                    content: Text(
-                                                                        'คุณแน่ใจว่าต้องการลบรายการนี้?'),
+                                                                    content:
+                                                                        const Text(
+                                                                            'คุณแน่ใจว่าต้องการลบรายการนี้?'),
                                                                     actions: <Widget>[
                                                                       TextButton(
                                                                         onPressed:
@@ -562,7 +570,7 @@ class _HomepageWebState extends State<HomepageWeb> {
                                                                           Navigator.of(context)
                                                                               .pop(false); // ผู้ใช้กด "ยกเลิก"
                                                                         },
-                                                                        child: Text(
+                                                                        child: const Text(
                                                                             'ยกเลิก'),
                                                                       ),
                                                                       TextButton(
@@ -571,7 +579,7 @@ class _HomepageWebState extends State<HomepageWeb> {
                                                                           Navigator.of(context)
                                                                               .pop(true); // ผู้ใช้กด "ยืนยัน"
                                                                         },
-                                                                        child: Text(
+                                                                        child: const Text(
                                                                             'ยืนยัน'),
                                                                       ),
                                                                     ],
@@ -596,8 +604,8 @@ class _HomepageWebState extends State<HomepageWeb> {
                                                               }
                                                             },
                                                           )
-                                                        : const SizedBox(), // ไม่แสดงอะไรหาก username ไม่ตรงกัน
-                                                  ),
+                                                        : const SizedBox(), // ไม่แสดงอะไรหากไม่มีสิทธิ์ลบ
+                                                  )
                                                 ]);
                                               }).toList(),
                                             ),

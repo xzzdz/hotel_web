@@ -64,7 +64,7 @@ class _DetailState extends State<Detail> {
           report_user_tel = data['report']['report_user_tel'];
           assigned_to_tel = data['report']['assigned_to_tel'];
           imageUrl = data['report']['image'] != null
-              ? "http://www.comdept.cmru.ac.th/64143168/hotel_app_php/${data['report']['image']}"
+              ? "http://www.comdept.cmru.ac.th/64143168/hotel_app_php/image_view.php?filename=${data['report']['image']}"
               : null;
 
           print('Response JSON: $data');
@@ -229,32 +229,39 @@ class _DetailState extends State<Detail> {
   // 'https://upload.wikimedia.org/wikipedia/commons/4/43/Cute_dog.jpg',
   // http://www.comdept.cmru.ac.th/64143168/hotel_app_php/uploads/679b234aa937e_img.jpg
 
+  // 'http://www.comdept.cmru.ac.th/64143168/hotel_app_php/image_view.php?filename=uploads/67a1c1dfa406e_img.jpg'true
+
   Widget _buildImage() {
-    if (imageUrl != null && imageUrl!.isNotEmpty) {
-      return InkWell(
-        onTap: () async {
-          // เปิด URL เมื่อคลิกที่ลิงก์
-          if (await canLaunch(imageUrl!)) {
-            await launch(imageUrl!);
-          } else {
-            throw 'ไม่สามารถเปิด URL ได้: $imageUrl';
-          }
-        },
-        child: Container(
-          padding: EdgeInsets.all(8),
-          child: Text(
-            'คลิกที่นี่เพื่อดูรูปภาพ',
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.blue,
-              decoration: TextDecoration.underline,
-            ),
-          ),
-        ),
-      );
-    } else {
-      return Center(child: Text('ไม่มีภาพให้แสดง'));
-    }
+    return Image.network(
+      imageUrl!,
+      fit: BoxFit.cover,
+    );
+
+    // if (imageUrl != null && imageUrl!.isNotEmpty) {
+    //   return InkWell(
+    //     onTap: () async {
+    //       // เปิด URL เมื่อคลิกที่ลิงก์
+    //       if (await canLaunch(imageUrl!)) {
+    //         await launch(imageUrl!);
+    //       } else {
+    //         throw 'ไม่สามารถเปิด URL ได้: $imageUrl';
+    //       }
+    //     },
+    //     child: Container(
+    //       padding: EdgeInsets.all(8),
+    //       child: Text(
+    //         'คลิกที่นี่เพื่อดูรูปภาพ',
+    //         style: TextStyle(
+    //           fontSize: 16,
+    //           color: Colors.blue,
+    //           decoration: TextDecoration.underline,
+    //         ),
+    //       ),
+    //     ),
+    //   );
+    // } else {
+    //   return Center(child: Text('ไม่มีภาพให้แสดง'));
+    // }
   }
 
   Widget _buildActionButton(String label, String newStatus) {
