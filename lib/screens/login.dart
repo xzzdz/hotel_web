@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:http/http.dart' as http;
+import 'package:url_launcher/url_launcher.dart';
 import 'dart:convert';
 import '../constant/color_font.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -122,91 +123,113 @@ class _LoginState extends State<Login> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: bgcolor,
-      body: Center(
-        child: Form(
-          key: formKey,
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              bool isSmallScreen = constraints.maxWidth < 700; // หน้าจอขนาดเล็ก
+      body: Stack(
+        children: [
+          Center(
+            child: Form(
+              key: formKey,
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  bool isSmallScreen = constraints.maxWidth < 700;
 
-              return SingleChildScrollView(
-                child: Padding(
-                  padding:
-                      const EdgeInsets.all(16.0), // เพิ่ม padding ให้เหมาะสม
-                  child: Column(
-                    children: [
-                      if (!isSmallScreen) ...[
-                        // แสดง Row เฉพาะหน้าจอใหญ่
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
+                  return SingleChildScrollView(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        children: [
+                          if (!isSmallScreen) ...[
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Image.asset(
-                                  'assets/img/111.png',
-                                  width: 300,
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Image.asset(
+                                      'assets/img/111.png',
+                                      width: 300,
+                                    ),
+                                    Text(
+                                      'ระบบแจ้งซ่อม',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        color: Colors.grey,
+                                        fontFamily: Font_.Fonts_T,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    Text(
+                                      'โรงแรมเดอะแคนนาส เชียงใหม่',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        color: Colors.grey,
+                                        fontFamily: Font_.Fonts_T,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                                // const SizedBox(height: 10),
-                                Text(
-                                  'ระบบแจ้งซ่อม',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    color: Colors.grey,
-                                    fontFamily: Font_.Fonts_T,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                Text(
-                                  'โรงแรมเดอะแคนนาส เชียงใหม่',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    color: Colors.grey,
-                                    fontFamily: Font_.Fonts_T,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
+                                const SizedBox(width: 30),
+                                _buildLoginForm(),
                               ],
                             ),
-                            const SizedBox(width: 30),
+                          ] else ...[
+                            Image.asset(
+                              'assets/img/111.png',
+                              width: 200,
+                            ),
+                            const SizedBox(height: 10),
+                            Text(
+                              'แอปพลิเคชันระบบแจ้งซ่อม',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.grey,
+                                fontFamily: Font_.Fonts_T,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text(
+                              'โรงแรมเดอะแคนนาส เชียงใหม่',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.grey,
+                                fontFamily: Font_.Fonts_T,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 20),
                             _buildLoginForm(),
                           ],
-                        ),
-                      ] else ...[
-                        // แสดง Column สำหรับหน้าจอเล็ก
-                        Image.asset(
-                          'assets/img/111.png',
-                          width: 200, // ลดขนาดโลโก้ในหน้าจอเล็ก
-                        ),
-                        const SizedBox(height: 10),
-                        Text(
-                          'แอปพลิเคชันระบบแจ้งซ่อม',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.grey,
-                            fontFamily: Font_.Fonts_T,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Text(
-                          'โรงแรมเดอะแคนนาส เชียงใหม่',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.grey,
-                            fontFamily: Font_.Fonts_T,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        _buildLoginForm(),
-                      ],
-                    ],
-                  ),
-                ),
-              );
-            },
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
           ),
-        ),
+          Positioned(
+            bottom: 20,
+            right: 20,
+            child: ElevatedButton.icon(
+              onPressed: () {
+                launchUrl(Uri.parse(
+                    "https://drive.google.com/drive/u/0/folders/1-WuvODM8aaS5hyr3GI1rfPPxg5R1faqV"));
+              },
+              icon: Icon(Icons.download, color: Colors.white),
+              label: Text(
+                'ดาวน์โหลดแอปพลิเคชัน',
+                style: TextStyle(color: Colors.white),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: bottoncolor,
+                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

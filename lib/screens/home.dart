@@ -417,6 +417,7 @@ class _HomepageWebState extends State<HomepageWeb> {
 
                                                 return DataRow(cells: [
                                                   DataCell(Text(item['date'])),
+
                                                   DataCell(Text(item['type'])),
 
                                                   DataCell(

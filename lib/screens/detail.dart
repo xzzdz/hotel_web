@@ -7,7 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../constant/color_font.dart';
 import '../constant/sidebar.dart';
 import 'login.dart';
-import 'package:url_launcher/url_launcher.dart';
+// import 'package:url_launcher/url_launcher.dart';
 
 class Detail extends StatefulWidget {
   final dynamic item;
@@ -23,6 +23,7 @@ class _DetailState extends State<Detail> {
   String? currentStatus;
   String? assignedTo;
   String? username;
+  String? completedTime;
   String? report_user_tel;
   String? assigned_to_tel;
   String? role;
@@ -63,6 +64,8 @@ class _DetailState extends State<Detail> {
           location = data['report']['location']; // ดึงข้อมูล location
           report_user_tel = data['report']['report_user_tel'];
           assigned_to_tel = data['report']['assigned_to_tel'];
+          completedTime =
+              data['report']['completed_time']; // ดึงข้อมูล completed_time
           imageUrl = data['report']['image'] != null
               ? "http://www.comdept.cmru.ac.th/64143168/hotel_app_php/image_view.php?filename=${data['report']['image']}"
               : null;
@@ -159,6 +162,7 @@ class _DetailState extends State<Detail> {
                         child: ListView(
                           children: [
                             _buildDetailItem('รหัสแจ้งซ่อม', widget.item['id']),
+
                             _buildDetailItem(
                                 'ผู้แจ้งซ่อม', username ?? '-'), // ใช้ username
                             _buildDetailItem(
@@ -171,6 +175,8 @@ class _DetailState extends State<Detail> {
                                 'รายละเอียด', widget.item['detail']),
                             _buildDetailItem('สถานะ', currentStatus ?? '-'),
                             _buildDetailItem('วันที่แจ้ง', widget.item['date']),
+                            _buildDetailItem(
+                                'เวลาที่แจ้งซ่อม', widget.item['time']),
 
                             if (assignedTo != null && assignedTo!.isNotEmpty)
                               _buildDetailItem('ช่างซ่อม', assignedTo ?? '-'),
@@ -178,6 +184,12 @@ class _DetailState extends State<Detail> {
                             if (assignedTo != null && assignedTo!.isNotEmpty)
                               _buildDetailItem(
                                   'เบอร์โทรช่างซ่อม', assigned_to_tel ?? '-'),
+
+                            if (completedTime != null &&
+                                completedTime!.isNotEmpty)
+                              _buildDetailItem('วัน - เวลาที่เสร็จสิ้น',
+                                  completedTime ?? '-'),
+
                             const SizedBox(height: 16),
 
                             if (imageUrl != null && imageUrl!.isNotEmpty)
@@ -226,42 +238,12 @@ class _DetailState extends State<Detail> {
       ),
     );
   }
-  // 'https://upload.wikimedia.org/wikipedia/commons/4/43/Cute_dog.jpg',
-  // http://www.comdept.cmru.ac.th/64143168/hotel_app_php/uploads/679b234aa937e_img.jpg
-
-  // 'http://www.comdept.cmru.ac.th/64143168/hotel_app_php/image_view.php?filename=uploads/67a1c1dfa406e_img.jpg'true
 
   Widget _buildImage() {
     return Image.network(
       imageUrl!,
       fit: BoxFit.cover,
     );
-
-    // if (imageUrl != null && imageUrl!.isNotEmpty) {
-    //   return InkWell(
-    //     onTap: () async {
-    //       // เปิด URL เมื่อคลิกที่ลิงก์
-    //       if (await canLaunch(imageUrl!)) {
-    //         await launch(imageUrl!);
-    //       } else {
-    //         throw 'ไม่สามารถเปิด URL ได้: $imageUrl';
-    //       }
-    //     },
-    //     child: Container(
-    //       padding: EdgeInsets.all(8),
-    //       child: Text(
-    //         'คลิกที่นี่เพื่อดูรูปภาพ',
-    //         style: TextStyle(
-    //           fontSize: 16,
-    //           color: Colors.blue,
-    //           decoration: TextDecoration.underline,
-    //         ),
-    //       ),
-    //     ),
-    //   );
-    // } else {
-    //   return Center(child: Text('ไม่มีภาพให้แสดง'));
-    // }
   }
 
   Widget _buildActionButton(String label, String newStatus) {

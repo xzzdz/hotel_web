@@ -74,12 +74,16 @@ class _AddReportState extends State<AddReport> {
       request.fields['status'] = _selectedStatus;
       request.fields['detail'] = _detailController.text;
       request.fields['location'] = _locationController.text;
+      request.fields['time'] =
+          "${DateTime.now().hour}:${DateTime.now().minute}:${DateTime.now().second}"; // เวลาปัจจุบัน
 
       print('username: $username');
       print('type: $_selectedType');
       print('status: $_selectedStatus');
       print('detail: ${_detailController.text}');
       print('location: ${_locationController.text}');
+      print(
+          'time: ${DateTime.now().toLocal().toString().split(' ')[1]}'); // แสดงเวลา
 
       // For web (dart:io not available)
       if (kIsWeb && _selectedImage != null) {
